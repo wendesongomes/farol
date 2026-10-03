@@ -7,6 +7,8 @@ export const en = {
   pinnedGroup: "Pinned",
   outsideGroup: "Outside a worktree",
   forgotten: "forgotten?",
+  search: "Search port, name, worktree or origin",
+  noResults: (query: string) => `Nothing found for "${query}".`,
   portCount: (n: number) => (n === 1 ? "1 open port" : `${n} open ports`),
 
   // Types and actions

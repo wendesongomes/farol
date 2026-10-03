@@ -23,4 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Front-end / back-end detection: keywords from `rules/detection.toml` (longest match wins), then a single `GET /` to `localhost` (HTML means front-end), cached per process. Click the label to correct it; the choice is saved and survives server restarts.
 - Main action per row: front-ends open `http://localhost:<port>` in the browser, back-ends open a terminal in the process folder (Terminal on macOS; Windows Terminal or the console on Windows; the first installed terminal on Linux).
 - Shows who started each server: Claude Code, Cursor, VS Code, a terminal or the system (database services and the like), by walking up the process tree. Agents are highlighted. New agents can be added in `rules/detection.toml` alone.
+- Pin processes (star): pinned ones stay at the top and survive restarts.
+- Search by port, name, command, worktree, branch or origin.
+- Keyboard: arrow keys move between rows, `Esc` closes the panel.
+- Dark theme following the system.
 - Origin detection skips shells (`cmd`, `powershell`, `pwsh`) and only uses them as a fallback, so agents that start servers through a shell are still recognized.

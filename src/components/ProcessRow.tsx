@@ -2,7 +2,7 @@ import type { PortProcess } from "../types";
 import { language, messages as t } from "../i18n";
 import { formatUptime, isAgent, isForgotten, originName } from "../format";
 import { displayName } from "../processKey";
-import { ExternalLinkIcon, StopIcon, TerminalIcon } from "./icons";
+import { ExternalLinkIcon, StarIcon, StopIcon, TerminalIcon } from "./icons";
 
 export type RowState = "idle" | "confirm" | "stuck" | "busy";
 
@@ -14,16 +14,19 @@ interface Props {
   onStop: (force: boolean) => void;
   onToggleType: () => void;
   onPrimary: () => void;
+  onTogglePin: () => void;
 }
 
-export function ProcessRow({ process, state, onAskStop, onCancel, onStop, onToggleType, onPrimary }: Props) {
+export function ProcessRow(props: Props) {
+  const { process, state, onAskStop, onCancel, onStop, onToggleType, onPrimary, onTogglePin } = props;
   const busy = state === "busy";
   const showConfirm = state === "confirm" || state === "stuck" || busy;
   const known = process.pid !== null;
   const typeLabel = process.type === "front" ? t.front : t.back;
 
   return (
-    <li className="row">
+    // Rows are reachable with the arrow keys (see useArrowNavigation).
+    <li className="row" data-row tabIndex={-1} aria-label={`${process.port} ${process.command}`}>
       <div className="row-top">
         <div className="row-text">
           <div className="row-main">
@@ -54,6 +57,16 @@ export function ProcessRow({ process, state, onAskStop, onCancel, onStop, onTogg
         </div>
         <div className="actions">
           <PrimaryAction process={process} onClick={onPrimary} />
+          <button
+            type="button"
+            className={process.pinned ? "icon-button pinned" : "icon-button"}
+            aria-label={process.pinned ? t.unpin : t.pin}
+            aria-pressed={process.pinned}
+            title={process.pinned ? t.unpin : t.pin}
+            onClick={onTogglePin}
+          >
+            <StarIcon filled={process.pinned} />
+          </button>
           <button
             type="button"
             className="icon-button danger"

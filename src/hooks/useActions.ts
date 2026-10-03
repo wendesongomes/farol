@@ -42,5 +42,17 @@ export function useActions(refresh: () => Promise<unknown>, flash: (message: str
     [refresh, report],
   );
 
-  return { primary, toggleType };
+  const togglePin = useCallback(
+    async (p: PortProcess) => {
+      try {
+        await api.togglePin(p.key);
+        await refresh();
+      } catch (error) {
+        report(error);
+      }
+    },
+    [refresh, report],
+  );
+
+  return { primary, toggleType, togglePin };
 }

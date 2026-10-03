@@ -33,6 +33,7 @@ function renderRow(overrides: Partial<PortProcess> = {}) {
       onStop={noop}
       onToggleType={noop}
       onPrimary={noop}
+      onTogglePin={noop}
     />,
   );
 }
@@ -57,6 +58,7 @@ describe("ProcessRow", () => {
         onStop={vi.fn()}
         onToggleType={onToggleType}
         onPrimary={vi.fn()}
+        onTogglePin={vi.fn()}
       />,
     );
     screen.getByRole("button", { name: /detected as back-end/i }).click();

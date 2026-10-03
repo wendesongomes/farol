@@ -7,6 +7,8 @@ export const ptBR: Messages = {
   pinnedGroup: "Fixados",
   outsideGroup: "Fora de worktree",
   forgotten: "esquecido?",
+  search: "Buscar porta, nome, worktree ou origem",
+  noResults: (query: string) => `Nada encontrado para "${query}".`,
   portCount: (n: number) => (n === 1 ? "1 porta aberta" : `${n} portas abertas`),
 
   front: "front-end",
