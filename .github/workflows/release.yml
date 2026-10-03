@@ -2,10 +2,19 @@ name: Release
 
 # Pushing a tag such as v0.1.0 builds the installers for the three systems and
 # attaches them to a draft GitHub Release. Review the draft and publish it by
-# hand.
+# hand. It can also be started from the Actions tab ("Run workflow") with a
+# version: the tag is then created when the draft is published.
 on:
   push:
     tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version tag to release, e.g. v0.1.0
+        required: true
+
+env:
+  TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.version || github.ref_name }}
 
 permissions:
   contents: write
@@ -83,10 +92,10 @@ jobs:
           # WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
           # WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
         with:
-          tagName: ${{ github.ref_name }}
-          releaseName: Farol ${{ github.ref_name }}
+          tagName: ${{ env.TAG }}
+          releaseName: Farol ${{ env.TAG }}
           releaseBody: |
-            See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/${{ github.ref_name }}/CHANGELOG.md) for what changed, and the [README](https://github.com/${{ github.repository }}#installation) for installation steps on each system.
+            See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/${{ github.sha }}/CHANGELOG.md) for what changed, and the [README](https://github.com/${{ github.repository }}#installation) for installation steps on each system.
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}

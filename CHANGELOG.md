@@ -15,7 +15,7 @@ First version.
 
 - Open source project structure: license, README, contributing guide, issue and PR templates.
 - Detection rules in `rules/detection.toml`, with test cases in `rules/detection_tests.toml`.
-- CI on macOS, Windows and Linux, and a release workflow that builds the installers (universal `.dmg`; `.exe` and `.msi`; `.deb`, `.rpm` and `.AppImage`) into a draft GitHub Release when a `v*` tag is pushed.
+- CI on macOS, Windows and Linux, and a release workflow that builds the installers (universal `.dmg`; `.exe` and `.msi`; `.deb`, `.rpm` and `.AppImage`) into a draft GitHub Release when a `v*` tag is pushed or when it is run by hand from the Actions tab.
 - Tray / menu bar icon. On macOS and Windows a click toggles the panel; on Linux the icon opens a menu with "Open panel".
 - Global shortcut to toggle the panel: `Ctrl+Alt+P` (`Cmd+Option+P` on macOS).
 - Borderless panel window that hides when it loses focus or on `Esc`, placed next to the tray icon (top center of the screen on Linux), with no Dock or taskbar entry.
