@@ -42,59 +42,49 @@ jobs:
 
       # Tauri needs WebKitGTK and the AppIndicator library to compile on Linux.
       - name: Install Linux dependencies
-        if: runner.os == 'Linux' && hashFiles('src-tauri/Cargo.toml') != ''
+        if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file \
             libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev
 
       - name: Set up Node.js
-        if: hashFiles('package.json') != ''
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
           cache: npm
 
       - name: Install npm dependencies
-        if: hashFiles('package.json') != ''
         run: npm ci
 
       - name: Lint (front-end)
-        if: hashFiles('package.json') != ''
         run: npm run lint
 
       - name: Test (front-end)
-        if: hashFiles('package.json') != ''
         run: npm test
 
       - name: Set up Rust
-        if: hashFiles('src-tauri/Cargo.toml') != ''
         uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
 
       - name: Cache Rust build
-        if: hashFiles('src-tauri/Cargo.toml') != ''
         uses: Swatinem/rust-cache@v2
         with:
           workspaces: src-tauri
 
-      # tauri::generate_context! expects the front-end build output to exist.
+      # tauri::generate_context! embeds the front-end build, so it must exist.
       - name: Build front-end
-        if: hashFiles('src-tauri/Cargo.toml') != ''
         run: npm run build
 
       - name: cargo fmt
-        if: hashFiles('src-tauri/Cargo.toml') != ''
         working-directory: src-tauri
         run: cargo fmt --check
 
       - name: cargo clippy
-        if: hashFiles('src-tauri/Cargo.toml') != ''
         working-directory: src-tauri
         run: cargo clippy --all-targets -- -D warnings
 
       - name: cargo test
-        if: hashFiles('src-tauri/Cargo.toml') != ''
         working-directory: src-tauri
         run: cargo test

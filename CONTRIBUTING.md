@@ -49,6 +49,10 @@ There is an issue template, **Detection rule**, if you would rather ask for a ru
 src/                    React + TypeScript panel
   i18n/en.ts, pt-BR.ts  every user-facing string
 src-tauri/src/
+  lib.rs                app setup: plugins, tray, global shortcut
+  tray.rs               tray / menu bar icon and its menu
+  panel.rs              showing, hiding and placing the panel window
+  i18n.rs               the few native strings (tray menu)
   ports.rs              listening TCP sockets and their PIDs
   worktree.rs           git worktree and branch of a folder
   classify.rs           front-end vs back-end
