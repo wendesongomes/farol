@@ -54,6 +54,10 @@ src-tauri/src/
   panel.rs              showing, hiding and placing the panel window
   i18n.rs               the few native strings (tray menu)
   process.rs            ProcessInfo: plain data about a process
+  scan.rs               joins ports and processes into the list the panel shows
+  model.rs              PortProcess, the data sent to the panel (mirrors src/types.ts)
+  commands.rs           the functions the panel calls with invoke()
+  command.rs            running external programs without flashing a console
   ports.rs              listening TCP sockets and their PIDs
   worktree.rs           git worktree and branch of a folder
   classify.rs           front-end vs back-end

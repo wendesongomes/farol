@@ -1,12 +1,17 @@
+mod command;
+mod commands;
 mod i18n;
+mod model;
 mod panel;
-// Not called yet: the commands that list and kill processes (steps 3 and 4)
-// are their first users.
+// Not called yet: the kill command (step 4) is its first user.
 #[allow(dead_code, unused_imports)]
 mod platform;
-#[allow(dead_code)]
+mod ports;
 mod process;
+mod scan;
 mod tray;
+
+use std::sync::Arc;
 
 use tauri::RunEvent;
 use tauri_plugin_global_shortcut::{Code, Modifiers, Shortcut, ShortcutState};
@@ -34,6 +39,8 @@ pub fn run() {
                 .build(),
         )
         .manage(panel::PanelState::default())
+        .manage(Arc::new(scan::Scanner::default()))
+        .invoke_handler(tauri::generate_handler![commands::list_processes])
         .setup(|app| {
             // Menu bar app: no Dock icon and no app menu on macOS.
             #[cfg(target_os = "macos")]

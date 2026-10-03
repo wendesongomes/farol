@@ -16,6 +16,9 @@ pub struct ProcessInfo {
     /// Working directory, when the system tells us.
     pub cwd: Option<PathBuf>,
     pub parent: Option<ParentInfo>,
+    /// Start time in seconds since the Unix epoch. Together with the PID it
+    /// identifies a process even after the system reuses the PID.
+    pub start_time: u64,
 }
 
 /// The direct parent of a process, enough to recognize service managers

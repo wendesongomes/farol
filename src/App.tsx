@@ -1,8 +1,12 @@
 import { useEffect } from "react";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { messages as t } from "./i18n";
+import { useProcesses } from "./hooks/useProcesses";
+import { ProcessRow } from "./components/ProcessRow";
 
 export function App() {
+  const { processes } = useProcesses();
+
   useEffect(() => {
     document.documentElement.lang = navigator.language;
 
@@ -13,15 +17,24 @@ export function App() {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
 
+  const count = processes?.length ?? 0;
+
   return (
     <main className="panel">
       <header className="panel-header">
         <h1>{t.appName}</h1>
       </header>
       <section className="panel-body">
-        <p className="empty">{t.empty}</p>
+        {processes && processes.length === 0 && <p className="empty">{t.empty}</p>}
+        {processes && processes.length > 0 && (
+          <ul className="list">
+            {processes.map((p) => (
+              <ProcessRow key={`${p.pid}:${p.port}`} process={p} />
+            ))}
+          </ul>
+        )}
       </section>
-      <footer className="panel-footer">{t.portCount(0)}</footer>
+      <footer className="panel-footer">{t.portCount(count)}</footer>
     </main>
   );
 }
