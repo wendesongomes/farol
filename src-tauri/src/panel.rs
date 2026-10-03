@@ -97,6 +97,10 @@ pub fn init(app: &AppHandle) {
     });
 }
 
+pub fn is_open(app: &AppHandle) -> bool {
+    window_if_visible(app).is_some()
+}
+
 fn window_if_visible(app: &AppHandle) -> Option<WebviewWindow> {
     window(app).filter(|w| w.is_visible().unwrap_or(false))
 }

@@ -27,4 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Search by port, name, command, worktree, branch or origin.
 - Keyboard: arrow keys move between rows, `Esc` closes the panel.
 - Dark theme following the system.
+- Number of open ports next to the tray icon (macOS menu bar, Linux where supported) and in its tooltip (all systems, the only option on Windows). It updates every 3 seconds with the panel open and every 15 seconds with it closed.
+- "Start at login" option in the tray menu.
+- The global shortcut can be changed in the preferences file.
 - Origin detection skips shells (`cmd`, `powershell`, `pwsh`) and only uses them as a fallback, so agents that start servers through a shell are still recognized.

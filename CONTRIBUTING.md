@@ -65,6 +65,7 @@ src/                    React + TypeScript panel
 src-tauri/src/
   lib.rs                app setup: plugins, tray, global shortcut
   tray.rs               tray / menu bar icon and its menu
+  counter.rs            number of open ports next to the tray icon
   panel.rs              showing, hiding and placing the panel window
   i18n.rs               the few native strings (tray menu)
   process.rs            ProcessInfo: plain data about a process

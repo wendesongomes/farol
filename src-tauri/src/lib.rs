@@ -2,6 +2,7 @@ mod actions;
 mod classify;
 mod command;
 mod commands;
+mod counter;
 mod i18n;
 mod model;
 mod origin;
@@ -23,7 +24,7 @@ use tauri_plugin_global_shortcut::{Code, Modifiers, Shortcut, ShortcutState};
 /// Opens the panel from anywhere: Ctrl+Alt+P, or Cmd+Option+P on macOS. It is
 /// the only way to toggle the panel with one action on Linux trays that don't
 /// report clicks.
-fn panel_shortcut() -> Shortcut {
+fn default_shortcut() -> Shortcut {
     #[cfg(target_os = "macos")]
     let modifiers = Modifiers::SUPER | Modifiers::ALT;
     #[cfg(not(target_os = "macos"))]
@@ -31,14 +32,31 @@ fn panel_shortcut() -> Shortcut {
     Shortcut::new(Some(modifiers), Code::KeyP)
 }
 
+/// The shortcut from the preferences file, if it is valid.
+fn panel_shortcut(prefs: &prefs::Prefs) -> Shortcut {
+    match prefs.shortcut.as_deref().map(str::parse::<Shortcut>) {
+        Some(Ok(shortcut)) => shortcut,
+        Some(Err(error)) => {
+            eprintln!("farol: invalid shortcut in preferences ({error}), using the default");
+            default_shortcut()
+        }
+        None => default_shortcut(),
+    }
+}
+
 pub fn run() {
     let app = tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_autostart::init(
+            tauri_plugin_autostart::MacosLauncher::LaunchAgent,
+            None,
+        ))
         .plugin(tauri_plugin_store::Builder::default().build())
         .plugin(
             tauri_plugin_global_shortcut::Builder::new()
-                .with_handler(|app, shortcut, event| {
-                    if event.state == ShortcutState::Pressed && *shortcut == panel_shortcut() {
+                // Farol registers a single shortcut: the panel toggle.
+                .with_handler(|app, _shortcut, event| {
+                    if event.state == ShortcutState::Pressed {
                         panel::toggle(app, None);
                     }
                 })
@@ -59,14 +77,17 @@ pub fn run() {
             #[cfg(target_os = "macos")]
             app.set_activation_policy(tauri::ActivationPolicy::Accessory);
 
-            app.manage(prefs::PrefsState::load(app.handle()));
+            let prefs = prefs::PrefsState::load(app.handle());
+            let shortcut = panel_shortcut(&prefs.snapshot());
+            app.manage(prefs);
             panel::init(app.handle());
             tray::create(app.handle())?;
+            counter::start(app.handle().clone());
 
             // Another app may already own the shortcut. Farol still works
             // through the tray icon, so this is not fatal.
             use tauri_plugin_global_shortcut::GlobalShortcutExt;
-            if let Err(error) = app.global_shortcut().register(panel_shortcut()) {
+            if let Err(error) = app.global_shortcut().register(shortcut) {
                 eprintln!("farol: could not register the global shortcut: {error}");
             }
 

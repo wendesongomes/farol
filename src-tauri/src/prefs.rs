@@ -21,6 +21,9 @@ const STORE_KEY: &str = "prefs";
 pub struct Prefs {
     pub type_overrides: BTreeMap<String, ProcessType>,
     pub pins: BTreeSet<String>,
+    /// Global shortcut that toggles the panel, e.g. "CmdOrCtrl+Shift+L".
+    /// Read at startup; `None` uses the default.
+    pub shortcut: Option<String>,
 }
 
 /// `"<worktree root or 'none'>:<port>:<name>"`.
