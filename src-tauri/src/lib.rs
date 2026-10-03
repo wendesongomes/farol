@@ -1,10 +1,9 @@
+mod actions;
 mod command;
 mod commands;
 mod i18n;
 mod model;
 mod panel;
-// Not called yet: the kill command (step 4) is its first user.
-#[allow(dead_code, unused_imports)]
 mod platform;
 mod ports;
 mod process;
@@ -40,7 +39,10 @@ pub fn run() {
         )
         .manage(panel::PanelState::default())
         .manage(Arc::new(scan::Scanner::default()))
-        .invoke_handler(tauri::generate_handler![commands::list_processes])
+        .invoke_handler(tauri::generate_handler![
+            commands::list_processes,
+            commands::kill_process
+        ])
         .setup(|app| {
             // Menu bar app: no Dock icon and no app menu on macOS.
             #[cfg(target_os = "macos")]

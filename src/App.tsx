@@ -2,10 +2,15 @@ import { useEffect } from "react";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { messages as t } from "./i18n";
 import { useProcesses } from "./hooks/useProcesses";
+import { useFlash } from "./hooks/useFlash";
+import { useStop } from "./hooks/useStop";
+import { rowKey } from "./processKey";
 import { ProcessRow } from "./components/ProcessRow";
 
 export function App() {
-  const { processes } = useProcesses();
+  const { processes, refresh } = useProcesses();
+  const { message, flash } = useFlash();
+  const stopper = useStop(refresh, flash);
 
   useEffect(() => {
     document.documentElement.lang = navigator.language;
@@ -29,12 +34,21 @@ export function App() {
         {processes && processes.length > 0 && (
           <ul className="list">
             {processes.map((p) => (
-              <ProcessRow key={`${p.pid}:${p.port}`} process={p} />
+              <ProcessRow
+                key={rowKey(p)}
+                process={p}
+                state={stopper.stateOf(p)}
+                onAskStop={() => stopper.ask(p)}
+                onCancel={stopper.cancel}
+                onStop={(force) => void stopper.stop(p, force)}
+              />
             ))}
           </ul>
         )}
       </section>
-      <footer className="panel-footer">{t.portCount(count)}</footer>
+      <footer className="panel-footer" aria-live="polite">
+        {message ?? t.portCount(count)}
+      </footer>
     </main>
   );
 }

@@ -1,19 +1,65 @@
 use std::path::Path;
 
+use windows_sys::Win32::Foundation::{CloseHandle, GetLastError, ERROR_ACCESS_DENIED};
+use windows_sys::Win32::System::Threading::{OpenProcess, PROCESS_TERMINATE};
+
 use super::{Platform, PlatformError, Result};
+use crate::command;
 use crate::process::ProcessInfo;
 
 pub struct Windows;
 
-// Filled in by the following steps: killing (step 4), opening a terminal
-// (step 7) and recognizing system services (step 8).
+/// Checks that the process exists and that we may stop it. `taskkill`'s own
+/// error messages are translated into the system language, so they can't be
+/// used to tell these cases apart.
+fn check_access(pid: u32) -> Result<()> {
+    // SAFETY: plain Win32 calls; the handle is closed before returning.
+    unsafe {
+        let handle = OpenProcess(PROCESS_TERMINATE, 0, pid);
+        if handle.is_null() {
+            return Err(match GetLastError() {
+                ERROR_ACCESS_DENIED => PlatformError::PermissionDenied,
+                // ERROR_INVALID_PARAMETER: no process with this PID.
+                _ => PlatformError::NotFound,
+            });
+        }
+        CloseHandle(handle);
+    }
+    Ok(())
+}
+
+fn taskkill(pid: u32, force: bool) -> std::io::Result<std::process::Output> {
+    let pid = pid.to_string();
+    let mut args = vec!["/PID", pid.as_str()];
+    if force {
+        args.insert(0, "/F");
+    }
+    command::quiet("taskkill").args(args).output()
+}
+
+// Filled in by the following steps: opening a terminal (step 7) and
+// recognizing system services (step 8).
 impl Platform for Windows {
-    fn terminate(_pid: u32) -> Result<()> {
-        Err(PlatformError::NotImplemented)
+    /// `taskkill` without `/F` posts a close message to the process' windows.
+    /// Console programs (node, python) usually have none and keep running;
+    /// that isn't an error here: the panel notices the port is still open
+    /// and offers to force it.
+    fn terminate(pid: u32) -> Result<()> {
+        check_access(pid)?;
+        taskkill(pid, false).map_err(|e| PlatformError::Other(e.to_string()))?;
+        Ok(())
     }
 
-    fn force_kill(_pid: u32) -> Result<()> {
-        Err(PlatformError::NotImplemented)
+    fn force_kill(pid: u32) -> Result<()> {
+        check_access(pid)?;
+        let output = taskkill(pid, true).map_err(|e| PlatformError::Other(e.to_string()))?;
+        if output.status.success() {
+            Ok(())
+        } else {
+            Err(PlatformError::Other(
+                String::from_utf8_lossy(&output.stderr).trim().to_string(),
+            ))
+        }
     }
 
     fn open_terminal(_cwd: &Path) -> Result<()> {

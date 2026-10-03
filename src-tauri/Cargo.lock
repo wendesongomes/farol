@@ -797,6 +797,7 @@ dependencies = [
 name = "farol"
 version = "0.1.0"
 dependencies = [
+ "libc",
  "netstat2",
  "serde",
  "serde_json",
@@ -805,6 +806,7 @@ dependencies = [
  "tauri",
  "tauri-build",
  "tauri-plugin-global-shortcut",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]

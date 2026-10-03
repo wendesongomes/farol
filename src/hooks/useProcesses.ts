@@ -8,11 +8,15 @@ const REFRESH_MS = 3000;
 export function useProcesses() {
   const [processes, setProcesses] = useState<PortProcess[] | null>(null);
 
-  const refresh = useCallback(async () => {
+  /** Reloads the list now and returns it (null if it could not be read). */
+  const refresh = useCallback(async (): Promise<PortProcess[] | null> => {
     try {
-      setProcesses(await api.listProcesses());
+      const list = await api.listProcesses();
+      setProcesses(list);
+      return list;
     } catch (error) {
       console.error("list_processes failed", error);
+      return null;
     }
   }, []);
 

@@ -66,6 +66,7 @@ src-tauri/src/
   platform/
     mod.rs              the `Platform` trait and `PlatformError`
     macos.rs, windows.rs, linux.rs
+    unix.rs             signals, shared by macOS and Linux
 ```
 
 The classification logic (`classify.rs`, `origin.rs`) receives data that was already collected, as plain structs, and never calls the operating system. That is why its tests run on any system.

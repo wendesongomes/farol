@@ -15,7 +15,7 @@ pub fn quiet<S: AsRef<OsStr>>(program: S) -> Command {
         const CREATE_NO_WINDOW: u32 = 0x0800_0000;
         command.creation_flags(CREATE_NO_WINDOW);
     }
-    command.stdin(Stdio::null()).stderr(Stdio::null());
+    command.stdin(Stdio::null());
     command
 }
 

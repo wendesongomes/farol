@@ -8,6 +8,7 @@
   --muted: #6b7280;
   --separator: #ececef;
   --border: rgba(0, 0, 0, 0.08);
+  --hover: rgba(0, 0, 0, 0.05);
   --shadow: 0 8px 28px rgba(0, 0, 0, 0.14), 0 1px 3px rgba(0, 0, 0, 0.08);
 
   --font-sans: "Geist Variable", system-ui, sans-serif;
@@ -27,6 +28,7 @@
     --muted: #9a9ca5;
     --separator: #2c2d33;
     --border: rgba(255, 255, 255, 0.08);
+    --hover: rgba(255, 255, 255, 0.07);
     --shadow: 0 8px 28px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.4);
   }
 }
@@ -114,6 +116,17 @@ body {
   border-bottom: none;
 }
 
+.row-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.row-text {
+  flex: 1;
+  min-width: 0;
+}
+
 .row-main {
   display: flex;
   align-items: baseline;
@@ -144,4 +157,89 @@ body {
   margin-top: 2px;
   font-size: 12px;
   color: var(--muted);
+}
+
+.actions {
+  display: flex;
+  flex: none;
+  gap: 2px;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.icon-button {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.icon-button:hover:not(:disabled) {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.icon-button.danger {
+  color: var(--danger);
+}
+
+.icon-button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.confirm {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.confirm-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.button {
+  height: 26px;
+  padding: 0 10px;
+  border: 1px solid var(--separator);
+  border-radius: 6px;
+  background: transparent;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.button.danger-outline {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.button.danger-solid {
+  border-color: var(--danger);
+  background: var(--danger);
+  color: #fff;
 }
