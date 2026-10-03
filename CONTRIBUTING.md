@@ -39,6 +39,20 @@ Every rule should come with a test case in [`rules/detection_tests.toml`](rules/
    cargo test
    ```
 
+### Example: a new AI agent
+
+Agents need no code either. Give the agent an `id` and a `label` (what the panel shows), the executable names it runs as and keywords from its command line:
+
+```toml
+[[origin.agents]]
+id = "windsurf"
+label = "Windsurf"
+names = ["windsurf", "Windsurf", "Windsurf Helper"]
+command_keywords = ["Windsurf.app"]
+```
+
+Then add an `[[origin]]` case to `rules/detection_tests.toml` with the process tree you saw (`ps -o pid,ppid,comm,args` on macOS and Linux, `Get-CimInstance Win32_Process` on Windows).
+
 The same applies to agents (`[[origin.agents]]`), terminals (`[origin.terminals]`, one list per system), shells (`[origin.shells]`) and system services (`[system_services.*]`). The comments at the top of each section explain how matching works (case-insensitive, whole words, `.exe` ignored).
 
 There is an issue template, **Detection rule**, if you would rather ask for a rule than write it.
@@ -63,7 +77,7 @@ src-tauri/src/
   rules.rs              loads rules/detection.toml and matches keywords
   classify.rs           front-end vs back-end (keywords, then an HTTP probe)
   prefs.rs              pins and type corrections, saved with tauri-plugin-store
-  origin.rs             who started a process
+  origin.rs             who started a process (walks the process tree)
   actions.rs            stop a process, open a terminal
   platform/
     mod.rs              the `Platform` trait and `PlatformError`

@@ -1,11 +1,12 @@
 use std::path::Path;
 
 use super::{spawn, unix, Platform, PlatformError, Result};
+use crate::origin;
 use crate::process::ProcessInfo;
+use crate::rules::{rules, Os};
 
 pub struct Linux;
 
-// Filled in by step 8: recognizing system services.
 impl Platform for Linux {
     fn terminate(pid: u32) -> Result<()> {
         unix::terminate(pid)
@@ -23,8 +24,8 @@ impl Platform for Linux {
         spawn::detached(command)
     }
 
-    fn is_system_service(_process: &ProcessInfo) -> bool {
-        false
+    fn is_system_service(process: &ProcessInfo) -> bool {
+        origin::is_service(process, rules().system_services.get(Os::Linux))
     }
 }
 

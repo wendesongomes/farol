@@ -5,7 +5,9 @@ use windows_sys::Win32::System::Threading::{OpenProcess, PROCESS_TERMINATE};
 
 use super::{spawn, Platform, PlatformError, Result};
 use crate::command;
+use crate::origin;
 use crate::process::ProcessInfo;
+use crate::rules::{rules, Os};
 
 pub struct Windows;
 
@@ -37,7 +39,6 @@ fn taskkill(pid: u32, force: bool) -> std::io::Result<std::process::Output> {
     command::quiet("taskkill").args(args).output()
 }
 
-// Filled in by step 8: recognizing system services.
 impl Platform for Windows {
     /// `taskkill` without `/F` posts a close message to the process' windows.
     /// Console programs (node, python) usually have none and keep running;
@@ -72,10 +73,10 @@ impl Platform for Windows {
         let mut cmd = command::quiet("cmd");
         cmd.args(["/c", "start", "", "cmd", "/K", "cd", "/d"])
             .arg(cwd);
-        spawn::detached(cmd)
+        spawn::detached(cmd).map_err(|_| PlatformError::NoTerminal)
     }
 
-    fn is_system_service(_process: &ProcessInfo) -> bool {
-        false
+    fn is_system_service(process: &ProcessInfo) -> bool {
+        origin::is_service(process, rules().system_services.get(Os::Windows))
     }
 }

@@ -19,3 +19,13 @@ export function formatUptime(seconds: number, language: string): string {
   }
   return rtf.format(0, "second");
 }
+
+const NOT_AGENTS = new Set(["terminal", "system", "unknown"]);
+
+/** AI agents and editors are highlighted; terminals and the system are not. */
+export const isAgent = (origin: string) => !NOT_AGENTS.has(origin);
+
+/** "Claude Code", "terminal", or the label/id of an agent from the rules file. */
+export function originName(origin: string, label: string | null, names: Record<string, string>): string {
+  return names[origin] ?? label ?? origin;
+}

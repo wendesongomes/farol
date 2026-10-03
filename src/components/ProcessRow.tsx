@@ -1,6 +1,6 @@
 import type { PortProcess } from "../types";
 import { language, messages as t } from "../i18n";
-import { formatUptime, isForgotten } from "../format";
+import { formatUptime, isAgent, isForgotten, originName } from "../format";
 import { displayName } from "../processKey";
 import { ExternalLinkIcon, StopIcon, TerminalIcon } from "./icons";
 
@@ -45,6 +45,9 @@ export function ProcessRow({ process, state, onAskStop, onCancel, onStop, onTogg
               >
                 {typeLabel}
               </button>
+              <span className={isAgent(process.origin) ? "origin agent" : "origin"}>
+                {originName(process.origin, process.originLabel, t.origins)}
+              </span>
               <Uptime seconds={process.uptimeSeconds} />
             </div>
           )}

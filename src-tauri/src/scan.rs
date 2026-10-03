@@ -11,11 +11,13 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use sysinfo::{ProcessRefreshKind, ProcessesToUpdate, System, Uid, UpdateKind};
 
 use crate::classify;
-use crate::model::{Origin, PortProcess, ProcessType, TypeSource, Worktree};
+use crate::model::{PortProcess, ProcessType, TypeSource, Worktree};
+use crate::origin;
+use crate::platform::{Current, Platform};
 use crate::ports::{self, Listener};
 use crate::prefs::{self, Prefs};
 use crate::process::{ParentInfo, ProcessInfo};
-use crate::rules::rules;
+use crate::rules::{rules, Os};
 use crate::worktree::WorktreeCache;
 
 /// A PID plus its start time: still the same process after the system
@@ -29,6 +31,8 @@ pub struct Scanner {
     worktrees: WorktreeCache,
     /// Detected type per process: keywords and the HTTP probe run once.
     types: Mutex<HashMap<ProcessId, ProcessType>>,
+    /// Origin per process: the tree above a process doesn't change.
+    origins: Mutex<HashMap<ProcessId, String>>,
 }
 
 /// A process as seen during one scan, plus who owns it.
@@ -49,6 +53,7 @@ impl Default for Scanner {
             system: Mutex::new(System::new()),
             worktrees: WorktreeCache::default(),
             types: Mutex::new(HashMap::new()),
+            origins: Mutex::new(HashMap::new()),
         }
     }
 }
@@ -73,6 +78,7 @@ impl Scanner {
             .collect();
         let worktrees = self.worktrees.resolve_all(&folders);
         let types = self.detect_types(&rows, &processes);
+        let origins = self.detect_origins(&rows, &processes);
 
         let mut list: Vec<PortProcess> = rows
             .into_iter()
@@ -84,6 +90,10 @@ impl Scanner {
                     .and_then(|s| types.get(&s.id()).copied())
                     .unwrap_or(ProcessType::Back);
                 let mut row = build(listener, snapshot, worktree, now);
+                if let Some(origin) = snapshot.and_then(|s| origins.get(&s.id())) {
+                    row.origin_label = agent_label(origin);
+                    row.origin = origin.clone();
+                }
                 apply_prefs(&mut row, detected, prefs);
                 row
             })
@@ -130,6 +140,35 @@ impl Scanner {
             handles.into_iter().filter_map(|h| h.join().ok()).collect()
         });
         cache.extend(probed);
+        cache.clone()
+    }
+
+    /// Finds who started each listening process not seen before.
+    fn detect_origins(
+        &self,
+        rows: &[(Listener, Option<&Snapshot>)],
+        processes: &HashMap<u32, Snapshot>,
+    ) -> HashMap<ProcessId, String> {
+        let mut cache = self.origins.lock().unwrap();
+        cache.retain(|(pid, start), _| {
+            processes
+                .get(pid)
+                .is_some_and(|s| s.info.start_time == *start)
+        });
+        for snapshot in rows.iter().filter_map(|(_, s)| *s) {
+            cache.entry(snapshot.id()).or_insert_with(|| {
+                let chain = origin::ancestors(snapshot.info.pid, |pid| {
+                    processes.get(&pid).map(|s| &s.info)
+                });
+                origin::from_ancestors(&chain, Os::CURRENT, &rules().origin)
+                    .or_else(|| {
+                        Current::is_system_service(&snapshot.info).then(|| origin::SYSTEM.into())
+                    })
+                    // Daemons and `nohup` servers adopted by the root process
+                    // have no recognizable ancestor: that is expected.
+                    .unwrap_or_else(|| origin::UNKNOWN.into())
+            });
+        }
         cache.clone()
     }
 
@@ -229,11 +268,21 @@ fn build(
         worktree,
         kind: ProcessType::Back,
         type_source: TypeSource::Detected,
-        origin: Origin::Unknown,
+        origin: origin::UNKNOWN.into(),
+        origin_label: None,
         uptime_seconds: uptime,
         pinned: false,
         can_kill,
     }
+}
+
+fn agent_label(id: &str) -> Option<String> {
+    rules()
+        .origin
+        .agents
+        .iter()
+        .find(|agent| agent.id == id)
+        .and_then(|agent| agent.label.clone())
 }
 
 /// The user's choices win over detection.

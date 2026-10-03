@@ -16,19 +16,6 @@ pub enum TypeSource {
     Manual,
 }
 
-// Variants are filled in by origin detection (step 8).
-#[allow(dead_code)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
-#[serde(rename_all = "kebab-case")]
-pub enum Origin {
-    ClaudeCode,
-    Cursor,
-    Vscode,
-    Terminal,
-    System,
-    Unknown,
-}
-
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct Worktree {
     pub root: String,
@@ -52,7 +39,11 @@ pub struct PortProcess {
     #[serde(rename = "type")]
     pub kind: ProcessType,
     pub type_source: TypeSource,
-    pub origin: Origin,
+    /// "claude-code", "cursor", "vscode", any other agent id from
+    /// rules/detection.toml, "terminal", "system" or "unknown".
+    pub origin: String,
+    /// Display name for agents that only exist in the rules file.
+    pub origin_label: Option<String>,
     pub uptime_seconds: u64,
     pub pinned: bool,
     pub can_kill: bool,
@@ -74,7 +65,8 @@ mod tests {
             worktree: None,
             kind: ProcessType::Front,
             type_source: TypeSource::Detected,
-            origin: Origin::ClaudeCode,
+            origin: "claude-code".into(),
+            origin_label: None,
             uptime_seconds: 5,
             pinned: false,
             can_kill: true,

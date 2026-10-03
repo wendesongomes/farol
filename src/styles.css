@@ -305,3 +305,8 @@ button:focus-visible {
 .type-toggle:hover {
   color: var(--text);
 }
+
+.origin.agent {
+  color: var(--accent);
+  font-weight: 500;
+}

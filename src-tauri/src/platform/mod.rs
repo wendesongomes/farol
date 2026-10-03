@@ -31,8 +31,6 @@ compile_error!("Farol supports macOS, Windows and Linux.");
 
 pub type Result<T> = std::result::Result<T, PlatformError>;
 
-// `is_system_service` gets its first caller in step 8.
-#[allow(dead_code)]
 pub trait Platform {
     /// Asks the process to exit, giving it a chance to clean up
     /// (`SIGTERM` on macOS and Linux, `taskkill` without `/F` on Windows).
@@ -49,7 +47,6 @@ pub trait Platform {
     fn is_system_service(process: &ProcessInfo) -> bool;
 }
 
-#[allow(dead_code)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum PlatformError {
     /// The process no longer exists.
@@ -58,8 +55,6 @@ pub enum PlatformError {
     PermissionDenied,
     /// No terminal application could be found.
     NoTerminal,
-    /// Not available yet on this system.
-    NotImplemented,
     /// Anything else, with the system's own message.
     Other(String),
 }
@@ -70,7 +65,6 @@ impl fmt::Display for PlatformError {
             Self::NotFound => write!(f, "the process no longer exists"),
             Self::PermissionDenied => write!(f, "permission denied"),
             Self::NoTerminal => write!(f, "no terminal application found"),
-            Self::NotImplemented => write!(f, "not implemented on this system yet"),
             Self::Other(message) => write!(f, "{message}"),
         }
     }
@@ -85,7 +79,6 @@ impl PlatformError {
             Self::NotFound => "not-found",
             Self::PermissionDenied => "permission-denied",
             Self::NoTerminal => "no-terminal",
-            Self::NotImplemented => "not-implemented",
             Self::Other(_) => "other",
         }
     }

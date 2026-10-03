@@ -70,6 +70,9 @@ keywords = [
 # is found at all does a shell in the chain count as "terminal".
 #
 # For agents:
+#   id               = what the panel receives as the origin. The panel
+#                      translates the ids it knows; for new agents, add:
+#   label            = (optional) the name to show, e.g. "Windsurf".
 #   names            = exact executable names (e.g. "claude", "Cursor").
 #   command_keywords = keywords searched in the ancestor's command line. Claude
 #                      Code, for example, usually runs as `node .../claude`.

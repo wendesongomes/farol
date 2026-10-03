@@ -14,6 +14,7 @@ function proc(port: number, root: string | null, pinned = false): PortProcess {
     type: "back",
     typeSource: "detected",
     origin: "unknown",
+    originLabel: null,
     uptimeSeconds: 0,
     pinned,
     canKill: true,

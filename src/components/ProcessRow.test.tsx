@@ -16,6 +16,7 @@ const base: PortProcess = {
   type: "back",
   typeSource: "detected",
   origin: "unknown",
+  originLabel: null,
   uptimeSeconds: 120,
   pinned: false,
   canKill: true,
@@ -70,6 +71,14 @@ describe("ProcessRow", () => {
   it("does not flag recent servers", () => {
     renderRow({ uptimeSeconds: 3600 });
     expect(screen.queryByText(/forgotten\?/)).toBeNull();
+  });
+
+  it("shows who started the process", () => {
+    renderRow({ origin: "claude-code" });
+    expect(screen.getByText("Claude Code").className).toContain("agent");
+    cleanup();
+    renderRow({ origin: "terminal" });
+    expect(screen.getByText("terminal").className).not.toContain("agent");
   });
 
   it("disables stopping without permission", () => {

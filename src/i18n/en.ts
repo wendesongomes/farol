@@ -21,6 +21,16 @@ export const en = {
   pin: "Pin",
   unpin: "Unpin",
 
+  // Who started the process
+  origins: {
+    "claude-code": "Claude Code",
+    cursor: "Cursor",
+    vscode: "VS Code",
+    terminal: "terminal",
+    system: "system",
+    unknown: "unknown",
+  } as Record<string, string>,
+
   // Stopping a process
   stopLabel: (port: number) => `Stop the process on port ${port}`,
   noPermission: "No permission",

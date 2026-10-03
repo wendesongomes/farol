@@ -4,13 +4,12 @@ mod command;
 mod commands;
 mod i18n;
 mod model;
+mod origin;
 mod panel;
 mod platform;
 mod ports;
 mod prefs;
 mod process;
-// The origin rules get their first user in step 8.
-#[allow(dead_code)]
 mod rules;
 mod scan;
 mod tray;

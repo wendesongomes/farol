@@ -39,6 +39,9 @@ pub struct OriginRules {
 #[derive(Debug, Deserialize)]
 pub struct AgentRule {
     pub id: String,
+    /// How the panel shows it; agents Farol knows are translated there.
+    #[serde(default)]
+    pub label: Option<String>,
     pub names: Vec<String>,
     pub command_keywords: Vec<String>,
 }
@@ -73,6 +76,7 @@ impl Os {
         Os::Linux
     };
 
+    #[cfg_attr(not(test), allow(dead_code))]
     pub fn parse(name: &str) -> Option<Os> {
         match name {
             "macos" => Some(Os::Mac),

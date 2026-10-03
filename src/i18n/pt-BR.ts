@@ -20,6 +20,15 @@ export const ptBR: Messages = {
   pin: "Fixar",
   unpin: "Desafixar",
 
+  origins: {
+    "claude-code": "Claude Code",
+    cursor: "Cursor",
+    vscode: "VS Code",
+    terminal: "terminal",
+    system: "sistema",
+    unknown: "desconhecido",
+  },
+
   stopLabel: (port: number) => `Encerrar o processo da porta ${port}`,
   noPermission: "Sem permissão",
   confirmStop: (name: string) => `Encerrar ${name}?`,

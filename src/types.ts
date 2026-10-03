@@ -1,7 +1,11 @@
 // Mirrors `PortProcess` in src-tauri/src/model.rs.
 
 export type ProcessType = "front" | "back";
-export type Origin = "claude-code" | "cursor" | "vscode" | "terminal" | "system" | "unknown";
+/**
+ * Who started the process. Agent ids come from rules/detection.toml, so any
+ * other string is an agent added there.
+ */
+export type Origin = "claude-code" | "cursor" | "vscode" | "terminal" | "system" | "unknown" | (string & {});
 
 export interface Worktree {
   root: string;
@@ -22,6 +26,8 @@ export interface PortProcess {
   type: ProcessType;
   typeSource: "detected" | "manual";
   origin: Origin;
+  /** Display name for agents that only exist in the rules file. */
+  originLabel: string | null;
   uptimeSeconds: number;
   pinned: boolean;
   canKill: boolean;
