@@ -53,13 +53,14 @@ src-tauri/src/
   tray.rs               tray / menu bar icon and its menu
   panel.rs              showing, hiding and placing the panel window
   i18n.rs               the few native strings (tray menu)
+  process.rs            ProcessInfo: plain data about a process
   ports.rs              listening TCP sockets and their PIDs
   worktree.rs           git worktree and branch of a folder
   classify.rs           front-end vs back-end
   origin.rs             who started a process
   actions.rs            kill, open in browser, open terminal
   platform/
-    mod.rs              the `Platform` trait
+    mod.rs              the `Platform` trait and `PlatformError`
     macos.rs, windows.rs, linux.rs
 ```
 

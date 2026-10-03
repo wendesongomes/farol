@@ -1,5 +1,11 @@
 mod i18n;
 mod panel;
+// Not called yet: the commands that list and kill processes (steps 3 and 4)
+// are their first users.
+#[allow(dead_code, unused_imports)]
+mod platform;
+#[allow(dead_code)]
+mod process;
 mod tray;
 
 use tauri::RunEvent;
