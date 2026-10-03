@@ -6,6 +6,7 @@ export const ptBR: Messages = {
   otherUser: "outro usuário",
   pinnedGroup: "Fixados",
   outsideGroup: "Fora de worktree",
+  forgotten: "esquecido?",
   portCount: (n: number) => (n === 1 ? "1 porta aberta" : `${n} portas abertas`),
 
   stopLabel: (port: number) => `Encerrar o processo da porta ${port}`,

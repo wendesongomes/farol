@@ -6,6 +6,7 @@ export const en = {
   otherUser: "other user",
   pinnedGroup: "Pinned",
   outsideGroup: "Outside a worktree",
+  forgotten: "forgotten?",
   portCount: (n: number) => (n === 1 ? "1 open port" : `${n} open ports`),
 
   // Stopping a process

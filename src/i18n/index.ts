@@ -8,15 +8,21 @@ const catalogs: Record<string, Messages> = {
   "pt-BR": ptBR,
 };
 
-export function pickMessages(languages: readonly string[]): Messages {
+/** The supported language tag that best matches the user's preferences. */
+export function pickLanguage(languages: readonly string[]): string {
   for (const lang of languages) {
-    if (catalogs[lang]) return catalogs[lang];
+    if (catalogs[lang]) return lang;
     const primary = lang.split("-")[0].toLowerCase();
     const match = Object.keys(catalogs).find((tag) => tag.split("-")[0].toLowerCase() === primary);
-    if (match) return catalogs[match];
+    if (match) return match;
   }
-  return en;
+  return "en";
 }
 
-export const messages: Messages = pickMessages(navigator.languages ?? [navigator.language]);
+export function pickMessages(languages: readonly string[]): Messages {
+  return catalogs[pickLanguage(languages)];
+}
+
+export const language: string = pickLanguage(navigator.languages ?? [navigator.language]);
+export const messages: Messages = catalogs[language];
 export type { Messages };

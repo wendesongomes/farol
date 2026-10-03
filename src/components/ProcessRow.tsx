@@ -1,5 +1,6 @@
 import type { PortProcess } from "../types";
-import { messages as t } from "../i18n";
+import { language, messages as t } from "../i18n";
+import { formatUptime, isForgotten } from "../format";
 import { displayName } from "../processKey";
 import { StopIcon } from "./icons";
 
@@ -29,7 +30,8 @@ export function ProcessRow({ process, state, onAskStop, onCancel, onStop }: Prop
           </div>
           {process.pid !== null && (
             <div className="meta">
-              {process.name} · {process.pid}
+              <span title={`PID ${process.pid}`}>{process.name}</span>
+              <Uptime seconds={process.uptimeSeconds} />
             </div>
           )}
         </div>
@@ -72,5 +74,15 @@ export function ProcessRow({ process, state, onAskStop, onCancel, onStop }: Prop
         </div>
       )}
     </li>
+  );
+}
+
+function Uptime({ seconds }: { seconds: number }) {
+  const text = formatUptime(seconds, language);
+  if (!isForgotten(seconds)) return <span>{text}</span>;
+  return (
+    <span className="forgotten">
+      {text} · {t.forgotten}
+    </span>
   );
 }

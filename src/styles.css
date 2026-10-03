@@ -153,9 +153,22 @@ body {
 }
 
 .meta {
+  display: flex;
+  flex-wrap: wrap;
   margin-top: 2px;
   font-size: 12px;
   color: var(--muted);
+}
+
+.meta > * + *::before {
+  content: "·";
+  margin: 0 6px;
+  color: var(--muted);
+}
+
+.forgotten {
+  color: var(--warning);
+  font-weight: 500;
 }
 
 .actions {
