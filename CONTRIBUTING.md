@@ -59,7 +59,7 @@ src-tauri/src/
   commands.rs           the functions the panel calls with invoke()
   command.rs            running external programs without flashing a console
   ports.rs              listening TCP sockets and their PIDs
-  worktree.rs           git worktree and branch of a folder
+  worktree.rs           git worktree and branch of a folder (cached)
   classify.rs           front-end vs back-end
   origin.rs             who started a process
   actions.rs            kill, open in browser, open terminal

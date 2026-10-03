@@ -108,12 +108,11 @@ body {
 }
 
 .row {
-  padding: 10px 16px;
-  border-bottom: 1px solid var(--separator);
+  padding: 8px 16px;
 }
 
-.row:last-child {
-  border-bottom: none;
+.row + .row {
+  border-top: 1px solid var(--separator);
 }
 
 .row-top {
@@ -242,4 +241,39 @@ button:focus-visible {
   border-color: var(--danger);
   background: var(--danger);
   color: #fff;
+}
+
+.group + .group {
+  border-top: 1px solid var(--separator);
+}
+
+.group-header {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 10px 16px 2px;
+  min-width: 0;
+}
+
+.group-name {
+  flex: none;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.group-branch {
+  flex: none;
+  font-size: 11px;
+  color: var(--accent);
+}
+
+.group-path {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
 }

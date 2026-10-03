@@ -7,14 +7,16 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use sysinfo::{ProcessRefreshKind, ProcessesToUpdate, System, Uid, UpdateKind};
 
-use crate::model::{Origin, PortProcess, ProcessType, TypeSource};
+use crate::model::{Origin, PortProcess, ProcessType, TypeSource, Worktree};
 use crate::ports;
 use crate::process::{ParentInfo, ProcessInfo};
+use crate::worktree::WorktreeCache;
 
 pub struct Scanner {
     /// Kept between scans so sysinfo only reads new processes' details
     /// (command line, working directory) once.
     system: Mutex<System>,
+    worktrees: WorktreeCache,
 }
 
 /// A process as seen during one scan, plus who owns it.
@@ -27,6 +29,7 @@ impl Default for Scanner {
     fn default() -> Self {
         Self {
             system: Mutex::new(System::new()),
+            worktrees: WorktreeCache::default(),
         }
     }
 }
@@ -40,11 +43,24 @@ impl Scanner {
             .map(|d| d.as_secs())
             .unwrap_or_default();
 
-        let mut list: Vec<PortProcess> = listeners
+        let snapshots: Vec<_> = listeners
             .into_iter()
-            .map(|listener| {
-                let snapshot = listener.pid.and_then(|pid| processes.get(&pid));
-                build(listener, snapshot, now)
+            .map(|listener| (listener, listener.pid.and_then(|pid| processes.get(&pid))))
+            .collect();
+
+        let folders: Vec<_> = snapshots
+            .iter()
+            .filter_map(|(_, s)| s.and_then(|s| s.info.cwd.clone()))
+            .collect();
+        let worktrees = self.worktrees.resolve_all(&folders);
+
+        let mut list: Vec<PortProcess> = snapshots
+            .into_iter()
+            .map(|(listener, snapshot)| {
+                let worktree = snapshot
+                    .and_then(|s| s.info.cwd.as_ref())
+                    .and_then(|cwd| worktrees.get(cwd).cloned().flatten());
+                build(listener, snapshot, worktree, now)
             })
             .collect();
         list.sort_by_key(|p| (p.port, p.pid));
@@ -104,7 +120,12 @@ fn join_command(process: &sysinfo::Process) -> String {
         .join(" ")
 }
 
-fn build(listener: ports::Listener, snapshot: Option<&Snapshot>, now: u64) -> PortProcess {
+fn build(
+    listener: ports::Listener,
+    snapshot: Option<&Snapshot>,
+    worktree: Option<Worktree>,
+    now: u64,
+) -> PortProcess {
     let (name, command, cwd, uptime, can_kill) = match snapshot {
         Some(Snapshot { info, mine }) => {
             // Without permission the command line comes back empty; the
@@ -134,7 +155,7 @@ fn build(listener: ports::Listener, snapshot: Option<&Snapshot>, now: u64) -> Po
         name,
         command,
         cwd,
-        worktree: None,
+        worktree,
         kind: ProcessType::Back,
         type_source: TypeSource::Detected,
         origin: Origin::Unknown,
@@ -172,7 +193,7 @@ mod tests {
             port: 631,
             pid: None,
         };
-        let entry = build(listener, None, 100);
+        let entry = build(listener, None, None, 100);
         assert!(!entry.can_kill);
         assert_eq!(entry.name, "");
     }

@@ -6,6 +6,8 @@ import { useFlash } from "./hooks/useFlash";
 import { useStop } from "./hooks/useStop";
 import { rowKey } from "./processKey";
 import { ProcessRow } from "./components/ProcessRow";
+import { GroupHeader } from "./components/GroupHeader";
+import { groupProcesses } from "./group";
 
 export function App() {
   const { processes, refresh } = useProcesses();
@@ -31,20 +33,24 @@ export function App() {
       </header>
       <section className="panel-body">
         {processes && processes.length === 0 && <p className="empty">{t.empty}</p>}
-        {processes && processes.length > 0 && (
-          <ul className="list">
-            {processes.map((p) => (
-              <ProcessRow
-                key={rowKey(p)}
-                process={p}
-                state={stopper.stateOf(p)}
-                onAskStop={() => stopper.ask(p)}
-                onCancel={stopper.cancel}
-                onStop={(force) => void stopper.stop(p, force)}
-              />
-            ))}
-          </ul>
-        )}
+        {processes &&
+          groupProcesses(processes).map((group) => (
+            <section key={group.id} className="group" aria-label={group.name || undefined}>
+              <GroupHeader group={group} />
+              <ul className="list">
+                {group.processes.map((p) => (
+                  <ProcessRow
+                    key={rowKey(p)}
+                    process={p}
+                    state={stopper.stateOf(p)}
+                    onAskStop={() => stopper.ask(p)}
+                    onCancel={stopper.cancel}
+                    onStop={(force) => void stopper.stop(p, force)}
+                  />
+                ))}
+              </ul>
+            </section>
+          ))}
       </section>
       <footer className="panel-footer" aria-live="polite">
         {message ?? t.portCount(count)}

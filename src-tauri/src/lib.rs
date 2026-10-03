@@ -9,6 +9,7 @@ mod ports;
 mod process;
 mod scan;
 mod tray;
+mod worktree;
 
 use std::sync::Arc;
 

@@ -4,6 +4,8 @@ export const en = {
   appName: "Farol",
   empty: "No open ports. When a server starts, it shows up here.",
   otherUser: "other user",
+  pinnedGroup: "Pinned",
+  outsideGroup: "Outside a worktree",
   portCount: (n: number) => (n === 1 ? "1 open port" : `${n} open ports`),
 
   // Stopping a process
