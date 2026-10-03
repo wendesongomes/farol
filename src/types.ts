@@ -10,6 +10,8 @@ export interface Worktree {
 }
 
 export interface PortProcess {
+  /** Identifies the process across restarts (worktree, port and name). */
+  key: string;
   /** null when the system does not say who owns the port (e.g. another user on Linux). */
   pid: number | null;
   port: number;

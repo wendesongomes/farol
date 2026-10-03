@@ -4,6 +4,7 @@ import { messages as t } from "./i18n";
 import { useProcesses } from "./hooks/useProcesses";
 import { useFlash } from "./hooks/useFlash";
 import { useStop } from "./hooks/useStop";
+import { useActions } from "./hooks/useActions";
 import { rowKey } from "./processKey";
 import { ProcessRow } from "./components/ProcessRow";
 import { GroupHeader } from "./components/GroupHeader";
@@ -13,6 +14,7 @@ export function App() {
   const { processes, refresh } = useProcesses();
   const { message, flash } = useFlash();
   const stopper = useStop(refresh, flash);
+  const actions = useActions(refresh, flash);
 
   useEffect(() => {
     document.documentElement.lang = navigator.language;
@@ -46,6 +48,8 @@ export function App() {
                     onAskStop={() => stopper.ask(p)}
                     onCancel={stopper.cancel}
                     onStop={(force) => void stopper.stop(p, force)}
+                    onToggleType={() => void actions.toggleType(p)}
+                    onPrimary={() => void actions.primary(p)}
                   />
                 ))}
               </ul>

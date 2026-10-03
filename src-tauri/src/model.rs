@@ -1,18 +1,14 @@
 //! What the panel receives for each listening port. Mirrors `src/types.ts`.
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
-// Variants are filled in by detection (steps 7 and 8).
-#[allow(dead_code)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum ProcessType {
     Front,
     Back,
 }
 
-// Variants are filled in by detection (steps 7 and 8).
-#[allow(dead_code)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "lowercase")]
 pub enum TypeSource {
@@ -20,6 +16,7 @@ pub enum TypeSource {
     Manual,
 }
 
+// Variants are filled in by origin detection (step 8).
 #[allow(dead_code)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "kebab-case")]
@@ -42,6 +39,9 @@ pub struct Worktree {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PortProcess {
+    /// Identifies the process across restarts, for pins and type overrides:
+    /// see `prefs::key`.
+    pub key: String,
     /// `None` when the system doesn't say who owns the port.
     pub pid: Option<u32>,
     pub port: u16,
@@ -65,6 +65,7 @@ mod tests {
     #[test]
     fn serializes_like_the_typescript_model() {
         let process = PortProcess {
+            key: "none:3000:node".into(),
             pid: Some(42),
             port: 3000,
             name: "node".into(),

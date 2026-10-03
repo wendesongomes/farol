@@ -4,6 +4,7 @@ import type { PortProcess } from "./types";
 
 function proc(port: number, root: string | null, pinned = false): PortProcess {
   return {
+    key: `${root ?? "none"}:${port}:node`,
     pid: port,
     port,
     name: "node",

@@ -3,7 +3,7 @@ use std::path::Path;
 use windows_sys::Win32::Foundation::{CloseHandle, GetLastError, ERROR_ACCESS_DENIED};
 use windows_sys::Win32::System::Threading::{OpenProcess, PROCESS_TERMINATE};
 
-use super::{Platform, PlatformError, Result};
+use super::{spawn, Platform, PlatformError, Result};
 use crate::command;
 use crate::process::ProcessInfo;
 
@@ -37,8 +37,7 @@ fn taskkill(pid: u32, force: bool) -> std::io::Result<std::process::Output> {
     command::quiet("taskkill").args(args).output()
 }
 
-// Filled in by the following steps: opening a terminal (step 7) and
-// recognizing system services (step 8).
+// Filled in by step 8: recognizing system services.
 impl Platform for Windows {
     /// `taskkill` without `/F` posts a close message to the process' windows.
     /// Console programs (node, python) usually have none and keep running;
@@ -62,8 +61,18 @@ impl Platform for Windows {
         }
     }
 
-    fn open_terminal(_cwd: &Path) -> Result<()> {
-        Err(PlatformError::NotImplemented)
+    /// Windows Terminal when installed, the classic console otherwise.
+    fn open_terminal(cwd: &Path) -> Result<()> {
+        let mut wt = command::quiet("wt");
+        wt.arg("-d").arg(cwd);
+        if spawn::detached(wt).is_ok() {
+            return Ok(());
+        }
+        // `start` opens a new console window for the inner `cmd`.
+        let mut cmd = command::quiet("cmd");
+        cmd.args(["/c", "start", "", "cmd", "/K", "cd", "/d"])
+            .arg(cwd);
+        spawn::detached(cmd)
     }
 
     fn is_system_service(_process: &ProcessInfo) -> bool {

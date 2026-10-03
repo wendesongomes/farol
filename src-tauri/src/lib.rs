@@ -1,4 +1,5 @@
 mod actions;
+mod classify;
 mod command;
 mod commands;
 mod i18n;
@@ -6,14 +7,18 @@ mod model;
 mod panel;
 mod platform;
 mod ports;
+mod prefs;
 mod process;
+// The origin rules get their first user in step 8.
+#[allow(dead_code)]
+mod rules;
 mod scan;
 mod tray;
 mod worktree;
 
 use std::sync::Arc;
 
-use tauri::RunEvent;
+use tauri::{Manager, RunEvent};
 use tauri_plugin_global_shortcut::{Code, Modifiers, Shortcut, ShortcutState};
 
 /// Opens the panel from anywhere: Ctrl+Alt+P, or Cmd+Option+P on macOS. It is
@@ -29,6 +34,8 @@ fn panel_shortcut() -> Shortcut {
 
 pub fn run() {
     let app = tauri::Builder::default()
+        .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_store::Builder::default().build())
         .plugin(
             tauri_plugin_global_shortcut::Builder::new()
                 .with_handler(|app, shortcut, event| {
@@ -42,13 +49,18 @@ pub fn run() {
         .manage(Arc::new(scan::Scanner::default()))
         .invoke_handler(tauri::generate_handler![
             commands::list_processes,
-            commands::kill_process
+            commands::kill_process,
+            commands::open_in_browser,
+            commands::open_terminal,
+            commands::set_type_override,
+            commands::toggle_pin
         ])
         .setup(|app| {
             // Menu bar app: no Dock icon and no app menu on macOS.
             #[cfg(target_os = "macos")]
             app.set_activation_policy(tauri::ActivationPolicy::Accessory);
 
+            app.manage(prefs::PrefsState::load(app.handle()));
             panel::init(app.handle());
             tray::create(app.handle())?;
 

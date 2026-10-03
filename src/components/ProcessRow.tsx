@@ -2,7 +2,7 @@ import type { PortProcess } from "../types";
 import { language, messages as t } from "../i18n";
 import { formatUptime, isForgotten } from "../format";
 import { displayName } from "../processKey";
-import { StopIcon } from "./icons";
+import { ExternalLinkIcon, StopIcon, TerminalIcon } from "./icons";
 
 export type RowState = "idle" | "confirm" | "stuck" | "busy";
 
@@ -12,30 +12,45 @@ interface Props {
   onAskStop: () => void;
   onCancel: () => void;
   onStop: (force: boolean) => void;
+  onToggleType: () => void;
+  onPrimary: () => void;
 }
 
-export function ProcessRow({ process, state, onAskStop, onCancel, onStop }: Props) {
+export function ProcessRow({ process, state, onAskStop, onCancel, onStop, onToggleType, onPrimary }: Props) {
   const busy = state === "busy";
   const showConfirm = state === "confirm" || state === "stuck" || busy;
+  const known = process.pid !== null;
+  const typeLabel = process.type === "front" ? t.front : t.back;
 
   return (
     <li className="row">
       <div className="row-top">
         <div className="row-text">
           <div className="row-main">
-            <span className="port">{process.port}</span>
+            <span className="port" title={known ? `${process.name} · PID ${process.pid}` : undefined}>
+              {process.port}
+            </span>
             <span className="command" title={process.command}>
               {process.command || t.otherUser}
             </span>
           </div>
-          {process.pid !== null && (
+          {known && (
             <div className="meta">
-              <span title={`PID ${process.pid}`}>{process.name}</span>
+              <button
+                type="button"
+                className="type-toggle"
+                title={t.switchType(typeLabel)}
+                aria-label={t.switchType(typeLabel)}
+                onClick={onToggleType}
+              >
+                {typeLabel}
+              </button>
               <Uptime seconds={process.uptimeSeconds} />
             </div>
           )}
         </div>
         <div className="actions">
+          <PrimaryAction process={process} onClick={onPrimary} />
           <button
             type="button"
             className="icon-button danger"
@@ -74,6 +89,31 @@ export function ProcessRow({ process, state, onAskStop, onCancel, onStop }: Prop
         </div>
       )}
     </li>
+  );
+}
+
+/** Front-ends open in the browser; back-ends open a terminal in their folder. */
+function PrimaryAction({ process, onClick }: { process: PortProcess; onClick: () => void }) {
+  if (process.type === "front") {
+    const label = t.openInBrowser(process.port);
+    return (
+      <button type="button" className="icon-button" aria-label={label} title={label} onClick={onClick}>
+        <ExternalLinkIcon />
+      </button>
+    );
+  }
+  const label = process.cwd ? t.openTerminal : t.noFolder;
+  return (
+    <button
+      type="button"
+      className="icon-button"
+      aria-label={t.openTerminal}
+      title={label}
+      disabled={!process.cwd}
+      onClick={onClick}
+    >
+      <TerminalIcon />
+    </button>
   );
 }
 

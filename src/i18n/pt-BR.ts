@@ -9,6 +9,17 @@ export const ptBR: Messages = {
   forgotten: "esquecido?",
   portCount: (n: number) => (n === 1 ? "1 porta aberta" : `${n} portas abertas`),
 
+  front: "front-end",
+  back: "back-end",
+  switchType: (type: string) => `Detectado como ${type}. Clique para trocar.`,
+  openInBrowser: (port: number) => `Abrir localhost:${port} no navegador`,
+  openTerminal: "Abrir um terminal na pasta do processo",
+  noFolder: "Pasta desconhecida",
+  opening: (port: number) => `Abrindo localhost:${port}`,
+  openingTerminal: "Abrindo o terminal",
+  pin: "Fixar",
+  unpin: "Desafixar",
+
   stopLabel: (port: number) => `Encerrar o processo da porta ${port}`,
   noPermission: "Sem permissão",
   confirmStop: (name: string) => `Encerrar ${name}?`,

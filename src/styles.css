@@ -290,3 +290,18 @@ button:focus-visible {
   font-size: 11px;
   color: var(--muted);
 }
+
+.type-toggle {
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  font-size: inherit;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.type-toggle:hover {
+  color: var(--text);
+}

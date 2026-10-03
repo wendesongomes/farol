@@ -60,9 +60,11 @@ src-tauri/src/
   command.rs            running external programs without flashing a console
   ports.rs              listening TCP sockets and their PIDs
   worktree.rs           git worktree and branch of a folder (cached)
-  classify.rs           front-end vs back-end
+  rules.rs              loads rules/detection.toml and matches keywords
+  classify.rs           front-end vs back-end (keywords, then an HTTP probe)
+  prefs.rs              pins and type corrections, saved with tauri-plugin-store
   origin.rs             who started a process
-  actions.rs            kill, open in browser, open terminal
+  actions.rs            stop a process, open a terminal
   platform/
     mod.rs              the `Platform` trait and `PlatformError`
     macos.rs, windows.rs, linux.rs

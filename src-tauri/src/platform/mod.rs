@@ -13,6 +13,7 @@ use crate::process::ProcessInfo;
 mod linux;
 #[cfg(target_os = "macos")]
 mod macos;
+mod spawn;
 #[cfg(unix)]
 mod unix;
 #[cfg(windows)]
@@ -30,8 +31,7 @@ compile_error!("Farol supports macOS, Windows and Linux.");
 
 pub type Result<T> = std::result::Result<T, PlatformError>;
 
-// `open_terminal` and `is_system_service` get their first callers in steps 7
-// and 8.
+// `is_system_service` gets its first caller in step 8.
 #[allow(dead_code)]
 pub trait Platform {
     /// Asks the process to exit, giving it a chance to clean up

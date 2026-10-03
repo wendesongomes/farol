@@ -1,5 +1,7 @@
 //! Things the user can do to a process from the panel.
 
+use std::path::Path;
+
 use crate::platform::{Current, Platform, PlatformError, Result};
 
 pub fn kill(pid: u32, force: bool) -> Result<()> {
@@ -12,6 +14,14 @@ pub fn kill(pid: u32, force: bool) -> Result<()> {
     } else {
         Current::terminate(pid)
     }
+}
+
+pub fn open_terminal(cwd: &str) -> Result<()> {
+    let cwd = Path::new(cwd);
+    if !cwd.is_dir() {
+        return Err(PlatformError::NotFound);
+    }
+    Current::open_terminal(cwd)
 }
 
 #[cfg(test)]

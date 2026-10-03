@@ -9,6 +9,18 @@ export const en = {
   forgotten: "forgotten?",
   portCount: (n: number) => (n === 1 ? "1 open port" : `${n} open ports`),
 
+  // Types and actions
+  front: "front-end",
+  back: "back-end",
+  switchType: (type: string) => `Detected as ${type}. Click to change.`,
+  openInBrowser: (port: number) => `Open localhost:${port} in the browser`,
+  openTerminal: "Open a terminal in the process folder",
+  noFolder: "Folder unknown",
+  opening: (port: number) => `Opening localhost:${port}`,
+  openingTerminal: "Opening the terminal",
+  pin: "Pin",
+  unpin: "Unpin",
+
   // Stopping a process
   stopLabel: (port: number) => `Stop the process on port ${port}`,
   noPermission: "No permission",
