@@ -60,12 +60,14 @@ keywords = [
 # -----------------------------------------------------------------------------
 # Origin: who started the process
 # -----------------------------------------------------------------------------
-# Farol walks up the process tree (parent, grandparent, ...). The first
-# ancestor that matches an agent wins; only when no ancestor is an agent does
-# the first terminal match. Agents take priority because they often start
-# servers through a shell or terminal of their own (on Windows, `npm run`
-# goes through `cmd.exe`), and the agent is the answer to "who started it".
-# Agents are checked in the order they are listed here.
+# Farol walks up the process tree (parent, grandparent, ...) and stops at the
+# first ancestor that is an agent or a terminal. On each ancestor, agents are
+# checked before terminals, in the order they are listed here.
+#
+# Shells are different: they sit between almost every server and whoever
+# started it (on Windows, `npm run` goes through `cmd.exe` even inside Claude
+# Code), so they are skipped during the walk. Only when no agent or terminal
+# is found at all does a shell in the chain count as "terminal".
 #
 # For agents:
 #   names            = exact executable names (e.g. "claude", "Cursor").
@@ -87,10 +89,10 @@ id = "vscode"
 names = ["code", "Code", "Code Helper", "Code Helper (Plugin)"]
 command_keywords = ["Visual Studio Code.app", "Microsoft VS Code"]
 
-# Terminals: exact executable names, per operating system.
+# Terminal emulators: exact executable names, per operating system.
 [origin.terminals]
 macos = ["Terminal", "iTerm2", "Warp", "Alacritty", "kitty", "WezTerm", "wezterm-gui", "Ghostty"]
-windows = ["WindowsTerminal", "cmd", "powershell", "pwsh", "Warp", "Alacritty", "WezTerm", "wezterm-gui"]
+windows = ["WindowsTerminal", "Warp", "Alacritty", "WezTerm", "wezterm-gui"]
 linux = [
   "gnome-terminal-server",
   "konsole",
@@ -103,6 +105,13 @@ linux = [
   "ghostty",
   "xterm",
 ]
+
+# Shells: fallback only (see above). On Windows they also stand in for the
+# terminal when it is the classic console host, which is not a parent process.
+[origin.shells]
+macos = []
+windows = ["cmd", "powershell", "pwsh"]
+linux = []
 
 # -----------------------------------------------------------------------------
 # System services

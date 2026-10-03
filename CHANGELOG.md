@@ -12,3 +12,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Open source project structure: license, README, contributing guide, issue and PR templates.
 - Detection rules in `rules/detection.toml`, with test cases in `rules/detection_tests.toml`.
 - CI on macOS, Windows and Linux.
+- Origin detection skips shells (`cmd`, `powershell`, `pwsh`) and only uses them as a fallback, so agents that start servers through a shell are still recognized.

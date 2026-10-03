@@ -160,11 +160,11 @@ npm run tauri build -- --target universal-apple-darwin
 
 ## Uninstall
 
-Farol's app identifier is `app.farol`.
+Farol's app identifier is `io.github.wendesongomes.farol`.
 
-- **macOS:** drag Farol from Applications to the Trash and delete `~/Library/Application Support/app.farol`.
-- **Windows:** **Settings › Apps › Farol › Uninstall**. Data is kept in `%APPDATA%\app.farol`; delete it to remove everything.
-- **Linux:** remove it with your package manager (or delete the AppImage). Data is kept in `~/.local/share/app.farol`.
+- **macOS:** drag Farol from Applications to the Trash and delete `~/Library/Application Support/io.github.wendesongomes.farol`.
+- **Windows:** **Settings › Apps › Farol › Uninstall**. Data is kept in `%APPDATA%\io.github.wendesongomes.farol`; delete it to remove everything.
+- **Linux:** remove it with your package manager (or delete the AppImage). Data is kept in `~/.local/share/io.github.wendesongomes.farol`.
 
 ## Contributing
 

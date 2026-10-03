@@ -39,7 +39,7 @@ Every rule should come with a test case in [`rules/detection_tests.toml`](rules/
    cargo test
    ```
 
-The same applies to agents (`[[origin.agents]]`), terminals (`[origin.terminals]`, one list per system) and system services (`[system_services.*]`). The comments at the top of each section explain how matching works (case-insensitive, whole words, `.exe` ignored).
+The same applies to agents (`[[origin.agents]]`), terminals (`[origin.terminals]`, one list per system), shells (`[origin.shells]`) and system services (`[system_services.*]`). The comments at the top of each section explain how matching works (case-insensitive, whole words, `.exe` ignored).
 
 There is an issue template, **Detection rule**, if you would rather ask for a rule than write it.
 

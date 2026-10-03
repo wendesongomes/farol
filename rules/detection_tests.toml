@@ -46,8 +46,7 @@ command = "node honest-server.js"
 expect = "none"
 
 # Origin: `ancestors` lists the process tree from the parent upwards, as
-# executable name + command line. An agent anywhere in the chain beats a
-# terminal closer to the process. `os` is "macos", "windows" or "linux".
+# executable name + command line. `os` is "macos", "windows" or "linux".
 # `expect` is the origin id ("claude-code", "cursor", "vscode", "terminal")
 # or "none".
 
@@ -93,3 +92,41 @@ ancestors = [
   { name = "node.exe", command = "node.exe C:\\Users\\me\\AppData\\Roaming\\npm\\node_modules\\@anthropic-ai\\claude-code\\cli.js" },
 ]
 expect = "claude-code"
+
+# Started by hand in Windows Terminal: the shell is skipped, the terminal wins.
+[[origin]]
+os = "windows"
+ancestors = [
+  { name = "cmd.exe", command = "cmd.exe /d /s /c npm run dev" },
+  { name = "pwsh.exe", command = "pwsh.exe -NoLogo" },
+  { name = "WindowsTerminal.exe", command = "WindowsTerminal.exe" },
+]
+expect = "terminal"
+
+# Classic console: no terminal process in the chain, so the shell counts.
+[[origin]]
+os = "windows"
+ancestors = [
+  { name = "cmd.exe", command = "cmd.exe" },
+  { name = "explorer.exe", command = "C:\\Windows\\Explorer.EXE" },
+]
+expect = "terminal"
+
+# A terminal closer to the process wins over an editor further up
+# (e.g. iTerm2 opened from VS Code).
+[[origin]]
+os = "macos"
+ancestors = [
+  { name = "zsh", command = "-zsh" },
+  { name = "iTerm2", command = "/Applications/iTerm.app/Contents/MacOS/iTerm2" },
+  { name = "Code Helper", command = "/Applications/Visual Studio Code.app/Contents/Frameworks/Code Helper.app/Contents/MacOS/Code Helper" },
+]
+expect = "terminal"
+
+# Daemonized (adopted by launchd): nothing matches.
+[[origin]]
+os = "macos"
+ancestors = [
+  { name = "launchd", command = "/sbin/launchd" },
+]
+expect = "none"
