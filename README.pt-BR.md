@@ -4,7 +4,7 @@
 
 [English](README.md)
 
-> **Status:** em desenvolvimento inicial. Ainda não há release publicada; por enquanto, [rode a partir do código-fonte](#rodar-a-partir-do-código-fonte).
+> **Status:** primeira versão (v0.1.0). Baixe na página de [Releases](https://github.com/<usuario>/farol/releases) ou [rode a partir do código-fonte](#rodar-a-partir-do-código-fonte).
 
 ![Painel do Farol](docs/screenshot.png)
 
@@ -21,7 +21,8 @@ O Farol fica na barra de menu (macOS) ou na bandeja do sistema (Windows e Linux)
 - Mostra quem subiu cada servidor: Claude Code, Cursor, VS Code, um terminal ou o sistema.
 - Mostra o tempo de execução e destaca servidores rodando há mais de 24 horas ("esquecido?").
 - Encerrar (com educação ou à força), abrir no navegador, abrir um terminal na pasta do processo.
-- Fixar processos, busca, temas claro e escuro, atalho global, iniciar com o sistema.
+- Fixar processos, busca, navegação pelo teclado, temas claro e escuro.
+- Número de portas abertas junto do ícone, atalho global, iniciar com o sistema.
 - Sem telemetria e sem acesso à rede (veja [Privacidade](#privacidade)).
 
 ## Onde funciona
@@ -55,16 +56,16 @@ Baixe o instalador do seu sistema na página de [Releases](https://github.com/<u
 
 - **`.deb`** (Debian/Ubuntu):
   ```bash
-  sudo apt install ./farol_<versão>_amd64.deb
+  sudo apt install ./Farol_<versão>_amd64.deb
   ```
 - **`.rpm`** (Fedora):
   ```bash
-  sudo dnf install ./farol-<versão>.x86_64.rpm
+  sudo dnf install ./Farol-<versão>-1.x86_64.rpm
   ```
 - **`.AppImage`** (qualquer distro):
   ```bash
-  chmod +x Farol_<versão>.AppImage
-  ./Farol_<versão>.AppImage
+  chmod +x Farol_<versão>_amd64.AppImage
+  ./Farol_<versão>_amd64.AppImage
   ```
 
 ### Gerenciadores de pacote
@@ -78,14 +79,28 @@ Homebrew, winget, Scoop e AUR: em breve.
   - **Windows:** na bandeja do sistema, perto do relógio. O Windows pode escondê-lo na setinha `^`; para deixá-lo sempre visível, arraste-o de lá para a barra de tarefas (ou ative-o em **Configurações › Personalização › Barra de tarefas › Outros ícones da bandeja do sistema**).
   - **Linux:** na bandeja / painel superior, conforme o ambiente gráfico.
 - **Abrir o painel:**
-  - **macOS e Windows:** clique no ícone.
+  - **macOS e Windows:** clique no ícone. Clique de novo, clique em qualquer outro lugar ou aperte `Esc` para fechar.
   - **Linux:** a maioria dos ambientes não envia cliques para ícones da bandeja, então o ícone abre um menu: escolha **Abrir painel**.
   - **Em todos:** atalho global `Ctrl+Alt+P` (`Cmd+Option+P` no macOS).
-- **Iniciar com o sistema:** pela opção **Iniciar com o sistema** no menu do próprio Farol.
+- **Menu do Farol** (clique direito no ícone no macOS e no Windows; qualquer clique no Linux): **Abrir painel**, **Iniciar com o sistema** e **Sair do Farol**.
+- **No painel:**
+  - Clique em `front-end` / `back-end` para corrigir o tipo; o Farol lembra da escolha, mesmo depois que o servidor reinicia.
+  - O primeiro botão abre front-ends no navegador e back-ends num terminal na pasta deles; a estrela fixa; o quadrado vermelho encerra (com **Forçar** para servidores que ignoram o pedido).
+  - Digite para buscar; as setas percorrem a lista.
+
+### Trocar o atalho
+
+Ainda não há tela de configurações. Feche o Farol, edite o arquivo de preferências e adicione uma entrada `shortcut` dentro de `prefs`, por exemplo `"shortcut": "CmdOrCtrl+Shift+L"` (`CmdOrCtrl` é Cmd no macOS e Ctrl nos outros; `Alt`, `Shift` e `Super` também funcionam). Depois abra o Farol de novo.
+
+| Sistema | Arquivo de preferências |
+|---|---|
+| macOS | `~/Library/Application Support/io.github.wendesongomes.farol/prefs.json` |
+| Windows | `%APPDATA%\io.github.wendesongomes.farol\prefs.json` |
+| Linux | `~/.local/share/io.github.wendesongomes.farol/prefs.json` |
 
 ## Privacidade
 
-O Farol não coleta dados e não acessa a internet. Ele só lê informações de processos locais e, para diferenciar front-ends de back-ends, faz uma requisição HTTP a `localhost` na porta analisada. As fontes e todos os outros recursos vêm empacotados no app.
+O Farol não coleta dados, não tem telemetria e não acessa a internet. Ele só lê informações de processos locais e, para diferenciar front-ends de back-ends, faz uma requisição HTTP a `localhost` na porta analisada. As fontes e todos os outros recursos vêm empacotados no app.
 
 O Farol nunca pede elevação de privilégio (`sudo`, UAC). Processos de outros usuários aparecem na lista quando o sistema permite, com as ações desabilitadas.
 

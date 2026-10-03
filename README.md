@@ -4,7 +4,7 @@
 
 [Português (Brasil)](README.pt-BR.md)
 
-> **Status:** early development. There is no published release yet; for now, [run it from source](#run-from-source).
+> **Status:** first version (v0.1.0). Download it from the [Releases](https://github.com/<user>/farol/releases) page or [run it from source](#run-from-source).
 
 ![Farol panel](docs/screenshot.png)
 
@@ -21,7 +21,8 @@ Farol lives in your menu bar (macOS) or system tray (Windows and Linux) and show
 - Shows who started each server: Claude Code, Cursor, VS Code, a terminal or the system.
 - Shows uptime and flags servers running for more than 24 hours ("forgotten?").
 - Stop (gracefully or forcefully), open in the browser, open a terminal in the process folder.
-- Pin processes, search, light and dark themes, global shortcut, start with the system.
+- Pin processes, search, keyboard navigation, light and dark themes.
+- Number of open ports next to the tray icon, global shortcut, start at login.
 - No telemetry, no network access (see [Privacy](#privacy)).
 
 ## Where it works
@@ -55,16 +56,16 @@ Download the installer for your system from the [Releases](https://github.com/<u
 
 - **`.deb`** (Debian/Ubuntu):
   ```bash
-  sudo apt install ./farol_<version>_amd64.deb
+  sudo apt install ./Farol_<version>_amd64.deb
   ```
 - **`.rpm`** (Fedora):
   ```bash
-  sudo dnf install ./farol-<version>.x86_64.rpm
+  sudo dnf install ./Farol-<version>-1.x86_64.rpm
   ```
 - **`.AppImage`** (any distro):
   ```bash
-  chmod +x Farol_<version>.AppImage
-  ./Farol_<version>.AppImage
+  chmod +x Farol_<version>_amd64.AppImage
+  ./Farol_<version>_amd64.AppImage
   ```
 
 ### Package managers
@@ -78,14 +79,28 @@ Homebrew, winget, Scoop and AUR: coming soon.
   - **Windows:** in the system tray, next to the clock. Windows may hide it behind the `^` arrow; to keep it visible, drag it from there onto the taskbar (or enable it in **Settings › Personalization › Taskbar › Other system tray icons**).
   - **Linux:** in the tray / top panel, depending on your desktop.
 - **Opening the panel:**
-  - **macOS and Windows:** click the icon.
+  - **macOS and Windows:** click the icon. Click it again, click anywhere else or press `Esc` to close it.
   - **Linux:** most desktops don't send clicks to tray icons, so the icon opens a menu: choose **Open panel**.
   - **Everywhere:** global shortcut `Ctrl+Alt+P` (`Cmd+Option+P` on macOS).
-- **Start with the system:** use the **Start at login** option in Farol's own menu.
+- **Farol's menu** (right click on the icon on macOS and Windows; any click on Linux): **Open panel**, **Start at login** and **Quit Farol**.
+- **In the panel:**
+  - Click `front-end` / `back-end` to correct the type; Farol remembers it, even after the server restarts.
+  - The first button opens front-ends in the browser and back-ends in a terminal in their folder; the star pins; the red square stops (with **Force** for servers that ignore the request).
+  - Type to search; arrow keys move between rows.
+
+### Changing the shortcut
+
+There is no settings screen yet. Quit Farol, edit its preferences file and add a `shortcut` entry inside `prefs`, e.g. `"shortcut": "CmdOrCtrl+Shift+L"` (`CmdOrCtrl` is Cmd on macOS and Ctrl elsewhere; `Alt`, `Shift` and `Super` also work). Then start Farol again.
+
+| System | Preferences file |
+|---|---|
+| macOS | `~/Library/Application Support/io.github.wendesongomes.farol/prefs.json` |
+| Windows | `%APPDATA%\io.github.wendesongomes.farol\prefs.json` |
+| Linux | `~/.local/share/io.github.wendesongomes.farol/prefs.json` |
 
 ## Privacy
 
-Farol collects no data and does not access the internet. It only reads local process information and, to tell front-ends from back-ends, makes one HTTP request to `localhost` on the port being inspected. Fonts and every other asset are bundled with the app.
+Farol collects no data, has no telemetry and does not access the internet. It only reads local process information and, to tell front-ends from back-ends, makes one HTTP request to `localhost` on the port being inspected. Fonts and every other asset are bundled with the app.
 
 Farol never asks for elevated privileges (`sudo`, UAC). Processes owned by other users are listed when the system allows it, with their actions disabled.
 

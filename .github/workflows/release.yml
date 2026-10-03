@@ -1,0 +1,92 @@
+name: Release
+
+# Pushing a tag such as v0.1.0 builds the installers for the three systems and
+# attaches them to a draft GitHub Release. Review the draft and publish it by
+# hand.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: macOS (universal .dmg)
+            os: macos-latest
+            args: --target universal-apple-darwin
+          - name: Windows (.exe, .msi)
+            os: windows-latest
+            args: ""
+          - name: Linux (.deb, .rpm, .AppImage)
+            # Built on the oldest supported base so the packages also run on
+            # older distributions (glibc is not backward compatible).
+            os: ubuntu-22.04
+            args: ""
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file \
+            libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev patchelf
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: npm
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          # Both architectures for the universal macOS build.
+          targets: ${{ runner.os == 'macOS' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Build and upload to the draft release
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+          # --- Code signing (not set up yet) -------------------------------
+          # Until these are configured, macOS shows "unidentified developer"
+          # and Windows shows SmartScreen on first launch (see README).
+          #
+          # macOS (Developer ID + notarization):
+          # APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          # APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          # APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          # APPLE_ID: ${{ secrets.APPLE_ID }}
+          # APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          # APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          #
+          # Windows: import the certificate in a step before this one and set
+          # bundle.windows.certificateThumbprint in tauri.conf.json, or use
+          # bundle.windows.signCommand for a cloud signing service.
+          # WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
+          # WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: Farol ${{ github.ref_name }}
+          releaseBody: |
+            See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/${{ github.ref_name }}/CHANGELOG.md) for what changed, and the [README](https://github.com/${{ github.repository }}#installation) for installation steps on each system.
+          releaseDraft: true
+          prerelease: false
+          args: ${{ matrix.args }}

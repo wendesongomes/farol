@@ -7,11 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-10-03
+
+First version.
+
 ### Added
 
 - Open source project structure: license, README, contributing guide, issue and PR templates.
 - Detection rules in `rules/detection.toml`, with test cases in `rules/detection_tests.toml`.
-- CI on macOS, Windows and Linux.
+- CI on macOS, Windows and Linux, and a release workflow that builds the installers (universal `.dmg`; `.exe` and `.msi`; `.deb`, `.rpm` and `.AppImage`) into a draft GitHub Release when a `v*` tag is pushed.
 - Tray / menu bar icon. On macOS and Windows a click toggles the panel; on Linux the icon opens a menu with "Open panel".
 - Global shortcut to toggle the panel: `Ctrl+Alt+P` (`Cmd+Option+P` on macOS).
 - Borderless panel window that hides when it loses focus or on `Esc`, placed next to the tray icon (top center of the screen on Linux), with no Dock or taskbar entry.
@@ -31,3 +35,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - "Start at login" option in the tray menu.
 - The global shortcut can be changed in the preferences file.
 - Origin detection skips shells (`cmd`, `powershell`, `pwsh`) and only uses them as a fallback, so agents that start servers through a shell are still recognized.
+
+[Unreleased]: https://github.com/wendesongomes/farol/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/wendesongomes/farol/releases/tag/v0.1.0
