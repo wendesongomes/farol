@@ -1,0 +1,100 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main, master]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-22.04]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Catches syntax errors in the rules before any Rust is built. The rules
+      # are the same on every system, so checking them once is enough.
+      - name: Set up Python
+        if: runner.os == 'Linux'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate detection rules
+        if: runner.os == 'Linux'
+        run: |
+          python3 - <<'EOF'
+          import tomllib
+          for path in ("rules/detection.toml", "rules/detection_tests.toml"):
+              with open(path, "rb") as f:
+                  tomllib.load(f)
+              print(f"ok: {path}")
+          EOF
+
+      # Tauri needs WebKitGTK and the AppIndicator library to compile on Linux.
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux' && hashFiles('src-tauri/Cargo.toml') != ''
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file \
+            libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev
+
+      - name: Set up Node.js
+        if: hashFiles('package.json') != ''
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: npm
+
+      - name: Install npm dependencies
+        if: hashFiles('package.json') != ''
+        run: npm ci
+
+      - name: Lint (front-end)
+        if: hashFiles('package.json') != ''
+        run: npm run lint
+
+      - name: Test (front-end)
+        if: hashFiles('package.json') != ''
+        run: npm test
+
+      - name: Set up Rust
+        if: hashFiles('src-tauri/Cargo.toml') != ''
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Cache Rust build
+        if: hashFiles('src-tauri/Cargo.toml') != ''
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      # tauri::generate_context! expects the front-end build output to exist.
+      - name: Build front-end
+        if: hashFiles('src-tauri/Cargo.toml') != ''
+        run: npm run build
+
+      - name: cargo fmt
+        if: hashFiles('src-tauri/Cargo.toml') != ''
+        working-directory: src-tauri
+        run: cargo fmt --check
+
+      - name: cargo clippy
+        if: hashFiles('src-tauri/Cargo.toml') != ''
+        working-directory: src-tauri
+        run: cargo clippy --all-targets -- -D warnings
+
+      - name: cargo test
+        if: hashFiles('src-tauri/Cargo.toml') != ''
+        working-directory: src-tauri
+        run: cargo test

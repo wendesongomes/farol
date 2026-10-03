@@ -1,0 +1,95 @@
+# Test cases for rules/detection.toml.
+#
+# `cargo test` (inside src-tauri) runs every case below against the rules.
+# When you add or change a rule, add a case here that would fail without it.
+
+# Front-end vs back-end: `command` is the full command line of the process
+# listening on the port; `expect` is "front", "back" or "none" (no keyword
+# matched, so Farol falls back to the HTTP probe).
+
+[[type]]
+command = "node /work/app/node_modules/.bin/vite"
+expect = "front"
+
+[[type]]
+command = "node /work/app/node_modules/.bin/next dev --port 3000"
+expect = "front"
+
+[[type]]
+command = "next-server (v14.2.3)"
+expect = "front"
+
+[[type]]
+command = "python3 -m http.server 8000"
+expect = "front"
+
+[[type]]
+command = "node /work/api/node_modules/.bin/nest start --watch"
+expect = "back"
+
+[[type]]
+command = "/opt/homebrew/opt/postgresql@16/bin/postgres -D /opt/homebrew/var/postgresql@16"
+expect = "back"
+
+[[type]]
+command = "uvicorn main:app --reload"
+expect = "back"
+
+# "php artisan" (back) is longer than "serve" (front), so it wins.
+[[type]]
+command = "php artisan serve"
+expect = "back"
+
+# Whole-word matching: "honest" must not match "nest".
+[[type]]
+command = "node honest-server.js"
+expect = "none"
+
+# Origin: `ancestors` lists the process tree from the parent upwards, as
+# executable name + command line. An agent anywhere in the chain beats a
+# terminal closer to the process. `os` is "macos", "windows" or "linux".
+# `expect` is the origin id ("claude-code", "cursor", "vscode", "terminal")
+# or "none".
+
+[[origin]]
+os = "macos"
+ancestors = [
+  { name = "zsh", command = "/bin/zsh -c npm run dev" },
+  { name = "node", command = "node /Users/me/.npm-global/bin/claude" },
+  { name = "zsh", command = "-zsh" },
+  { name = "iTerm2", command = "/Applications/iTerm.app/Contents/MacOS/iTerm2" },
+]
+expect = "claude-code"
+
+[[origin]]
+os = "macos"
+ancestors = [
+  { name = "zsh", command = "-zsh" },
+  { name = "Terminal", command = "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal" },
+]
+expect = "terminal"
+
+[[origin]]
+os = "linux"
+ancestors = [
+  { name = "bash", command = "bash" },
+  { name = "gnome-terminal-server", command = "/usr/libexec/gnome-terminal-server" },
+]
+expect = "terminal"
+
+[[origin]]
+os = "windows"
+ancestors = [
+  { name = "node.exe", command = "node.exe server.js" },
+  { name = "pwsh.exe", command = "pwsh.exe -NoLogo" },
+  { name = "Cursor.exe", command = "C:\\Users\\me\\AppData\\Local\\Programs\\cursor\\Cursor.exe" },
+]
+expect = "cursor"
+
+[[origin]]
+os = "windows"
+ancestors = [
+  { name = "cmd.exe", command = "cmd.exe /d /s /c npm run dev" },
+  { name = "node.exe", command = "node.exe C:\\Users\\me\\AppData\\Roaming\\npm\\node_modules\\@anthropic-ai\\claude-code\\cli.js" },
+]
+expect = "claude-code"

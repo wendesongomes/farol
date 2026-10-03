@@ -1,0 +1,124 @@
+# Farol detection rules
+#
+# This file is embedded in the binary at build time (`include_str!`), so changing
+# it changes detection without touching any Rust code. It is the easiest place to
+# contribute: adding support for a new framework, agent or terminal is usually a
+# one-line change plus a test. See CONTRIBUTING.md.
+#
+# Matching rules (shared by every list below):
+#   - Case-insensitive.
+#   - A trailing ".exe" on executable names is ignored.
+#   - Keywords match whole words or phrases: "nest" matches "nest start" and
+#     "/bin/nest", but not "honest". Word boundaries are any character that is
+#     not a letter or digit.
+
+# -----------------------------------------------------------------------------
+# Front-end vs back-end
+# -----------------------------------------------------------------------------
+# Keywords are searched in the full command line of the process listening on
+# the port. When keywords from both lists match, the longest keyword wins (it
+# is the most specific one), and ties go to back-end. This is why
+# `php artisan serve` is back-end even though "serve" is a front keyword.
+#
+# When nothing matches, Farol probes http://127.0.0.1:<port>/ once: an HTML
+# response means front-end, anything else means back-end.
+
+[type.front]
+keywords = [
+  "next dev",
+  "next-server",
+  "vite",
+  "react-scripts",
+  "ng serve",
+  "webpack serve",
+  "astro dev",
+  "nuxt",
+  "remix dev",
+  "http.server",
+  "serve",
+]
+
+[type.back]
+keywords = [
+  "nest",
+  "ts-node",
+  "nodemon",
+  "express",
+  "fastify",
+  "uvicorn",
+  "gunicorn",
+  "flask",
+  "django",
+  "rails",
+  "php artisan",
+  "postgres",
+  "redis",
+  "mysqld",
+  "mongod",
+]
+
+# -----------------------------------------------------------------------------
+# Origin: who started the process
+# -----------------------------------------------------------------------------
+# Farol walks up the process tree (parent, grandparent, ...). The first
+# ancestor that matches an agent wins; only when no ancestor is an agent does
+# the first terminal match. Agents take priority because they often start
+# servers through a shell or terminal of their own (on Windows, `npm run`
+# goes through `cmd.exe`), and the agent is the answer to "who started it".
+# Agents are checked in the order they are listed here.
+#
+# For agents:
+#   names            = exact executable names (e.g. "claude", "Cursor").
+#   command_keywords = keywords searched in the ancestor's command line. Claude
+#                      Code, for example, usually runs as `node .../claude`.
+
+[[origin.agents]]
+id = "claude-code"
+names = ["claude"]
+command_keywords = ["claude", "@anthropic-ai/claude-code"]
+
+[[origin.agents]]
+id = "cursor"
+names = ["cursor", "Cursor", "Cursor Helper", "Cursor Helper (Plugin)"]
+command_keywords = ["Cursor.app", "cursor"]
+
+[[origin.agents]]
+id = "vscode"
+names = ["code", "Code", "Code Helper", "Code Helper (Plugin)"]
+command_keywords = ["Visual Studio Code.app", "Microsoft VS Code"]
+
+# Terminals: exact executable names, per operating system.
+[origin.terminals]
+macos = ["Terminal", "iTerm2", "Warp", "Alacritty", "kitty", "WezTerm", "wezterm-gui", "Ghostty"]
+windows = ["WindowsTerminal", "cmd", "powershell", "pwsh", "Warp", "Alacritty", "WezTerm", "wezterm-gui"]
+linux = [
+  "gnome-terminal-server",
+  "konsole",
+  "xfce4-terminal",
+  "tilix",
+  "alacritty",
+  "kitty",
+  "wezterm",
+  "wezterm-gui",
+  "ghostty",
+  "xterm",
+]
+
+# -----------------------------------------------------------------------------
+# System services
+# -----------------------------------------------------------------------------
+# A process is a system service (origin "system") when its direct parent is the
+# OS service manager. On macOS the executable must also live under one of the
+# listed paths, so apps you launched yourself and that got re-parented to
+# launchd (e.g. with `nohup`) are not mistaken for services.
+
+[system_services.macos]
+parent_names = ["launchd"]
+executable_prefixes = ["/opt/homebrew", "/usr/local", "/usr/sbin"]
+
+[system_services.windows]
+parent_names = ["services"]
+
+[system_services.linux]
+# "systemd" covers both PID 1 and per-user `systemd --user` instances.
+parent_names = ["systemd"]
