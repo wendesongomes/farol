@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-10-05
+
+### Fixed
+
+- Opening Farol from the applications menu (or Applications, or the Start menu) now shows the panel. Before, nothing appeared, which left no way in on desktops that hide tray icons.
+- Opening Farol again while it is running shows the panel of the running copy instead of starting a second one.
+
+### Changed
+
+- When started at login, Farol stays in the tray without showing the panel.
+- README: what to do when the tray icon doesn't appear on Linux.
+
 ## [0.1.0] - 2026-10-03
 
 First version.
@@ -36,5 +48,6 @@ First version.
 - The global shortcut can be changed in the preferences file.
 - Origin detection skips shells (`cmd`, `powershell`, `pwsh`) and only uses them as a fallback, so agents that start servers through a shell are still recognized.
 
-[Unreleased]: https://github.com/wendesongomes/farol/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/wendesongomes/farol/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/wendesongomes/farol/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/wendesongomes/farol/releases/tag/v0.1.0

@@ -4,7 +4,7 @@
 
 [English](README.md)
 
-> **Status:** primeira versão (v0.1.0). Baixe na página de [Releases](https://github.com/<usuario>/farol/releases) ou [rode a partir do código-fonte](#rodar-a-partir-do-código-fonte).
+> **Status:** primeira versão (v0.1.1). Baixe na página de [Releases](https://github.com/<usuario>/farol/releases) ou [rode a partir do código-fonte](#rodar-a-partir-do-código-fonte).
 
 ![Painel do Farol](docs/screenshot.png)
 
@@ -81,12 +81,24 @@ Homebrew, winget, Scoop e AUR: em breve.
 - **Abrir o painel:**
   - **macOS e Windows:** clique no ícone. Clique de novo, clique em qualquer outro lugar ou aperte `Esc` para fechar.
   - **Linux:** a maioria dos ambientes não envia cliques para ícones da bandeja, então o ícone abre um menu: escolha **Abrir painel**.
-  - **Em todos:** atalho global `Ctrl+Alt+P` (`Cmd+Option+P` no macOS).
+  - **Em todos:** atalho global `Ctrl+Alt+P` (`Cmd+Option+P` no macOS), ou abra o Farol de novo pelo menu de aplicativos: o painel da cópia que já está rodando aparece.
 - **Menu do Farol** (clique direito no ícone no macOS e no Windows; qualquer clique no Linux): **Abrir painel**, **Iniciar com o sistema** e **Sair do Farol**.
 - **No painel:**
   - Clique em `front-end` / `back-end` para corrigir o tipo; o Farol lembra da escolha, mesmo depois que o servidor reinicia.
   - O primeiro botão abre front-ends no navegador e back-ends num terminal na pasta deles; a estrela fixa; o quadrado vermelho encerra (com **Forçar** para servidores que ignoram o pedido).
   - Digite para buscar; as setas percorrem a lista.
+
+### O ícone não aparece na bandeja no Linux?
+
+Abrir o Farol pelo menu de aplicativos sempre mostra o painel, então dá para usá-lo mesmo sem o ícone. Para ter o ícone:
+
+- **GNOME** (Fedora, Debian, Arch…; o Ubuntu já inclui) precisa da extensão AppIndicator. Instale, ative no app **Extensões** e saia e entre de novo na sessão:
+  ```bash
+  sudo dnf install gnome-shell-extension-appindicator   # Fedora
+  sudo apt install gnome-shell-extension-appindicator   # Debian
+  ```
+- Confira se o Farol está rodando: `pgrep -a farol`. Se não estiver, inicie pelo terminal (`farol` ou `./Farol_<versão>_amd64.AppImage`) e inclua o que ele imprimir num [relato de bug](https://github.com/<usuario>/farol/issues/new?template=bug_report.md).
+- No **Wayland**, os apps ainda não conseguem registrar atalhos globais do jeito que o Farol faz, então o `Ctrl+Alt+P` pode não funcionar; use o menu da bandeja ou o menu de aplicativos.
 
 ### Trocar o atalho
 

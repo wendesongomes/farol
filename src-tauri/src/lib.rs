@@ -21,6 +21,14 @@ use std::sync::Arc;
 use tauri::{Manager, RunEvent};
 use tauri_plugin_global_shortcut::{Code, Modifiers, Shortcut, ShortcutState};
 
+/// Passed by the "start at login" entry, so Farol knows nobody is waiting
+/// for a window.
+const AUTOSTART_FLAG: &str = "--autostart";
+
+fn started_at_login() -> bool {
+    std::env::args().any(|arg| arg == AUTOSTART_FLAG)
+}
+
 /// Opens the panel from anywhere: Ctrl+Alt+P, or Cmd+Option+P on macOS. It is
 /// the only way to toggle the panel with one action on Linux trays that don't
 /// report clicks.
@@ -46,10 +54,18 @@ fn panel_shortcut(prefs: &prefs::Prefs) -> Shortcut {
 
 pub fn run() {
     let app = tauri::Builder::default()
+        // Must come first. Opening Farol again (from the app menu, the Dock,
+        // the Start menu) shows the panel of the copy already running. This is
+        // also the way in where the tray icon can't be shown (GNOME without
+        // the AppIndicator extension) or the shortcut can't be grabbed
+        // (Wayland).
+        .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
+            panel::show(app, None);
+        }))
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_autostart::init(
             tauri_plugin_autostart::MacosLauncher::LaunchAgent,
-            None,
+            Some(vec![AUTOSTART_FLAG]),
         ))
         .plugin(tauri_plugin_store::Builder::default().build())
         .plugin(
@@ -91,8 +107,10 @@ pub fn run() {
                 eprintln!("farol: could not register the global shortcut: {error}");
             }
 
-            // In development, open the panel right away so changes are visible.
-            if cfg!(debug_assertions) {
+            // Opened by the user: show the panel, so it is clear Farol is
+            // running even if the tray icon is hidden. Started at login: stay
+            // in the tray.
+            if !started_at_login() {
                 panel::show(app.handle(), None);
             }
             Ok(())

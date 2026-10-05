@@ -4,7 +4,7 @@
 
 [Português (Brasil)](README.pt-BR.md)
 
-> **Status:** first version (v0.1.0). Download it from the [Releases](https://github.com/<user>/farol/releases) page or [run it from source](#run-from-source).
+> **Status:** first version (v0.1.1). Download it from the [Releases](https://github.com/<user>/farol/releases) page or [run it from source](#run-from-source).
 
 ![Farol panel](docs/screenshot.png)
 
@@ -81,12 +81,24 @@ Homebrew, winget, Scoop and AUR: coming soon.
 - **Opening the panel:**
   - **macOS and Windows:** click the icon. Click it again, click anywhere else or press `Esc` to close it.
   - **Linux:** most desktops don't send clicks to tray icons, so the icon opens a menu: choose **Open panel**.
-  - **Everywhere:** global shortcut `Ctrl+Alt+P` (`Cmd+Option+P` on macOS).
+  - **Everywhere:** global shortcut `Ctrl+Alt+P` (`Cmd+Option+P` on macOS), or open Farol again from your applications menu: the panel of the copy already running shows up.
 - **Farol's menu** (right click on the icon on macOS and Windows; any click on Linux): **Open panel**, **Start at login** and **Quit Farol**.
 - **In the panel:**
   - Click `front-end` / `back-end` to correct the type; Farol remembers it, even after the server restarts.
   - The first button opens front-ends in the browser and back-ends in a terminal in their folder; the star pins; the red square stops (with **Force** for servers that ignore the request).
   - Type to search; arrow keys move between rows.
+
+### No icon in the tray on Linux?
+
+Opening Farol from the applications menu always shows the panel, so you can use it even without the icon. To get the icon:
+
+- **GNOME** (Fedora, Debian, Arch…; Ubuntu already includes it) needs the AppIndicator extension. Install it, enable it in the **Extensions** app and log out and back in:
+  ```bash
+  sudo dnf install gnome-shell-extension-appindicator   # Fedora
+  sudo apt install gnome-shell-extension-appindicator   # Debian
+  ```
+- Check that Farol is running: `pgrep -a farol`. If it isn't, start it from a terminal (`farol`, or `./Farol_<version>_amd64.AppImage`) and include what it prints in a [bug report](https://github.com/<user>/farol/issues/new?template=bug_report.md).
+- On **Wayland**, apps can't register global shortcuts the way Farol does yet, so `Ctrl+Alt+P` may not work; use the tray menu or the applications menu.
 
 ### Changing the shortcut
 
