@@ -1,0 +1,27 @@
+name: Publish release
+
+# Publishes a draft created by the Release workflow (the tag is created at
+# this moment) and marks it as the latest release. Run it from the Actions
+# tab once the draft's installers have been checked.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Tag of the draft to publish, e.g. v0.1.1
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish the draft
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          gh release edit "$VERSION" --repo "$GITHUB_REPOSITORY" \
+            --draft=false --latest
+          gh release view "$VERSION" --repo "$GITHUB_REPOSITORY" --json url,isDraft,tagName
